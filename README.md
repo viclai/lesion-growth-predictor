@@ -30,6 +30,7 @@ packages are used in the scripts.
 
 * [numpy](http://www.numpy.org/)
 * [matplotlib](https://matplotlib.org/)
+* [scipy](https://www.scipy.org/)
 * [scikit-learn](http://scikit-learn.org/stable/)
 * [pandas](http://pandas.pydata.org/)
 
@@ -40,12 +41,12 @@ project. The base class *Data* can also be implemented in **_data.py_** to
 provide an interface to extract the data from the data set of your choice. If 
 the data set being used belongs to Scalzo, make sure that the path to the data 
 set indicated in **_data.py_** is modified accordingly. The included packages 
-in **_data.py_** should also be checked.
+in **_data.py_** should also be verified.
 
 Then, open up a terminal (or command line), change directories to this 
 repository directory, and enter the following to run the script to evaluate 
 the machine learning techniques.
 
 ```
-$ python models.py
+$ python main.py
 ```

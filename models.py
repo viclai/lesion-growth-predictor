@@ -1,5 +1,4 @@
 from sklearn.linear_model import SGDRegressor, PassiveAggressiveRegressor
-from data import PerfusionData
 import numpy as np
 
 """
@@ -13,23 +12,12 @@ Steps to evaluate a ML technique:
 		-- Repeat Step 3 to find the best model.
 """
 
-def train_SGD():
+def run_SGD(): # TODO: Specify data parameters
 	print 'Examining Stochastic Gradient Descent for Linear Regression...'
+	# TODO
 	print 'Done'
 
-def train_PA():
+def run_PA(): # TODO: Specify data parameters
 	print 'Examining Passive-Aggressive for Regression...'
+	# TODO
 	print 'Done'
-
-def main():
-	print 'Visualizing data...'
-	p_data = PerfusionData()
-	perfusion_params = p_data.perfusion_params
-	p_data.load('tmax', 6)
-	p_data.plot('2d-slices')
-
-	train_SGD()
-	train_PA()
-
-if __name__ == "__main__" :
-	main()
