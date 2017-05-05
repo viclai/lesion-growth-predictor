@@ -205,7 +205,7 @@ def main():
 				home = True
 				break
 			elif resp == 'Y':
-				continue
+				break
 			else:
 				print 'Invalid response. Try again.'
 
