@@ -37,11 +37,12 @@ packages are used in the scripts.
 # Usage
 Note that there is no data set published to this repository, so make sure a 
 data set is included as a subdirectory in this repository before running this 
-project. The base class *Data* can also be implemented in **_data.py_** to 
+project. The base class *DataSet* can also be implemented in **_data.py_** to 
 provide an interface to extract the data from the data set of your choice. If 
 the data set being used belongs to Scalzo, make sure that the path to the data 
-set indicated in **_data.py_** is modified accordingly. The included packages 
-in **_data.py_** should also be verified.
+sets indicated in **_data.py_** is modified accordingly. The included packages 
+in **_data.py_** should also be verified. The main script may also need to be
+modified accordingly.
 
 Then, open up a terminal (or command line), change directories to this 
 repository directory, and enter the following to run the script to evaluate 

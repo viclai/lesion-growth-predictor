@@ -1,4 +1,5 @@
 from collections import defaultdict
+from sklearn import metrics
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -86,7 +87,6 @@ def label_distribution(y, **kwargs):
 	Parameters
 	--------------------
 		y -- numpy matrix of shape (n,1), targets
-
 	"""
 
 	if 'color' not in kwargs:
@@ -148,6 +148,34 @@ def statistics(X, y, filename='stats.csv', **kwargs):
 	df = pd.DataFrame(d, index=features)
 
 	print ('Writing mean and standard deviation of each feature to ' +
-		  file_path + '...'),
+		   file_path + '...'),
 	df.to_csv(file_path, mode='w+')
 	print 'Done.'
+
+def regression_performance(y_true, y_pred, metric):
+	"""
+    Calculates the performance metric based on the agreement between the 
+    true labels and the predicted labels.
+    
+    Parameters
+    --------------------
+        y_true -- numpy array of shape (n,), known labels
+        y_pred -- numpy array of shape (n,), (continuous-valued) predictions
+        metric -- string, option used to select the performance measure
+                  options: 'mse', 'f1-mae', 'exp-var-score', 'r2-score'
+    
+    Returns
+    --------------------
+        score  -- float, performance score
+    """
+
+	if metric == "mse":
+		return metrics.mean_squared_error(y_true, y_pred)
+	elif metric == "mae":
+		return metrics.mean_absolute_error(y_true, y_pred)
+	elif metric == "exp-var-score":
+		return metrics.explained_variance_score(y_true, y_pred)
+	elif metric == "r2-score":
+		return metrics.r2_score(y_true, y_pred)
+	else:
+		return 0
