@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import math
 
 # Functions to visualize data, plot graphs, and evaluate models go here.
 
@@ -80,13 +81,14 @@ def two_dimensional_slices(X, y, **kwargs):
 			break
 		plt.clf()
 
-def label_distribution(y, **kwargs):
+def label_distribution(y, binsize=1, **kwargs):
 	"""
 	Plots a histogram displaying the distribution of the targets in the data.
 
 	Parameters
 	--------------------
-		y -- numpy matrix of shape (n,1), targets
+		y       -- numpy matrix of shape (n,1), targets
+		binsize -- size of the bin
 	"""
 
 	if 'color' not in kwargs:
@@ -94,7 +96,10 @@ def label_distribution(y, **kwargs):
 	
 	freqs = defaultdict(int)
 	for val in y.A1:
-		freqs[int(val)] += 1
+		slot = int(math.ceil(val))
+		if slot % binsize != 0:
+			slot = (slot / binsize) + binsize
+		freqs[slot] += 1
 	perf_values = freqs.keys()
 	frequencies = freqs.values()
 

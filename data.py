@@ -200,7 +200,8 @@ class PerfusionDataSet(DataSet):
 			two_dimensional_slices(X, y, **kwargs)
 		elif type == 'label_distribution':
 			kwargs['parameter_name'] = self.perfusion_param
-			label_distribution(y, **kwargs)
+			label_distribution(y, self.uniform_bins[self.perfusion_param],
+				**kwargs)
 		elif type == 'scatter_matrix':
 			time_interval = 2
 			kwargs['features'] = ['Time ' + str(i) for i in 
@@ -215,7 +216,7 @@ class PerfusionDataSet(DataSet):
 				xrange(0, time_interval * X.shape[1], time_interval)
 			]
 			filename = ('stats-' + self.perfusion_param + '_' + 
-						str(self.patch_radius) + '.csv')
+						str(self.patch_radius) + str(dt) + '.csv')
 			statistics(X, y, filename=filename, **kwargs)
 		else:
 			print 'No such plot exists\n'
