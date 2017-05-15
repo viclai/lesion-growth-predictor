@@ -78,6 +78,7 @@ def two_dimensional_slices(X, y, **kwargs):
 		plt.pause(0.001)
 		cont = raw_input("Press [C] to see next scatter plot. ")
 		if cont != "C" and cont != "c":
+			plt.close()
 			break
 		plt.clf()
 
@@ -113,7 +114,7 @@ def label_distribution(y, binsize=1, **kwargs):
 	plt.ylabel('Frequency', fontsize=16)
 	plt.show()
 	raw_input("Press any key to continue.")
-	plt.clf()
+	plt.close()
 
 def statistics(X, y, filename='stats.csv', **kwargs):
 	"""

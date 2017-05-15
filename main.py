@@ -1,4 +1,4 @@
-from data import PerfusionDataSet
+from data import PerfusionDataSet, NoDataError
 from models import run_SGD, run_PA
 import sys
 import numpy as np
@@ -38,10 +38,8 @@ def main():
 		param_val = None
 		param_val_range = [i + 1 for i in xrange(len(perfusion_params) - 1)]
 		while True:
-			print 'Indicate which perfusion parameter to evaulate.'
+			print 'Indicate which perfusion parameter to evaluate.'
 			for i, p in zip(xrange(len(perfusion_params)), perfusion_params):
-				if i == 0: # Skip parameter option 'all' for now
-					continue
 				print str(i) + ': ' + p
 			param_val = raw_input('Enter value: ')
 			if param_val == controls['Skip']:
@@ -99,88 +97,19 @@ def main():
 		if home == True:
 			continue
 
-		data_distr = { 1 : False, 2 : True }
-		### Indicate distribution of training data ###
-		while True:
-			print 'Indicate distribution of training data.'
-			print '1: Real'
-			print '2: Uniform'
-			distr_val = raw_input('Enter value: ')
-			if distr_val == controls['Skip']:
-				print 'Distribution is required.'
-			elif distr_val == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
-			elif distr_val == controls['Help']:
-				print_controls()
-			elif distr_val == controls['Home']:
-				home = True
-				break
-			else:
-				try:
-					distr_val = int(distr_val)
-					if distr_val not in [1,2]:
-						print ('Invalid value. Enter the value corresponding '
-					           'to distribution.')
-					else:
-						break
-				except:
-					print ('Invalid value. Enter the value corresponding to '
-					       'the distribution.')
-
-		if home == True:
-			continue
-
 		p_data.load(
 			perfusion_params[param_val],
 			patch_rad,
 			PerfusionDataSet.DataType.TRAIN,
-			data_distr[distr_val]
 			)
 		p_data.load(
 			perfusion_params[param_val],
 			patch_rad,
 			PerfusionDataSet.DataType.VALIDATION,
-			data_distr[distr_val]
 			)
-
-		### Indicate distribution of test data ###
-		while True:
-			print 'Indicate distribution of test data.'
-			print '1: Real'
-			print '2: Uniform'
-			distr_val = raw_input('Enter value: ')
-			if distr_val == controls['Skip']:
-				print 'Distribution is required.'
-			elif distr_val == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
-			elif distr_val == controls['Help']:
-				print_controls()
-			elif distr_val == controls['Home']:
-				home = True
-				break
-			else:
-				try:
-					distr_val = int(distr_val)
-					if distr_val not in [1,2]:
-						print ('Invalid value. Enter the value corresponding '
-					           'to the distribution.')
-					else:
-						break
-				except:
-					print ('Invalid value. Enter the value corresponding to '
-					       'the distribution.')
 
 		if home == True:
 			continue
-
-		p_data.load(
-			perfusion_params[param_val],
-			patch_rad,
-			PerfusionDataSet.DataType.TEST,
-			data_distr[distr_val]
-			)
 
 		######################################################################
 		# Visualize data
@@ -272,6 +201,10 @@ def main():
 								except ValueError:
 									print ('Invalid value. Enter the value '
 										   'corresponding to the data type.')
+									again = True
+								except NoDataError:
+									print ('No data loaded to display. '
+										   'Try another type.')
 									again = True
 
 								if not again or home == True:

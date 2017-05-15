@@ -1,11 +1,15 @@
 from enum import Enum
-from extracted_data import matrix_loader as real_ml
 from extracted_data.uniform_sampled.ten_k_subset \
-	import matrix_loader as unif_ml
+	import matrix_loader as ml
 from util import two_dimensional_slices, label_distribution, \
 				 scatter_matrix, statistics
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
+class NoDataError(Exception):
+	def __init__(self, msg='No data loaded'):
+		self.msg = msg
 
 class DataSet:
 	class DataType(Enum):
@@ -40,10 +44,9 @@ class DataSet:
 		pass
 
 class PerfusionDataSet(DataSet):
-	perfusion_params = list(real_ml.Matrix_loader().mets.keys())
-	patch_radiuses = [int(r[0]) for r in real_ml.Matrix_loader().halfwindowsizes]
-	path_to_real_dataset = 'extracted_data/gaus_7x7'
-	path_to_unif_dataset = 'extracted_data/uniform_sampled/ten_k_subset'
+	perfusion_params = list(ml.Matrix_loader().mets.keys())
+	patch_radiuses = [int(r[0]) for r in ml.Matrix_loader().halfwindowsizes]
+	path_to_dataset = 'extracted_data/uniform_sampled/ten_k_subset'
 	uniform_bins = {
 		'rbf' : 2,
 		'rbv' : 1,
@@ -66,7 +69,7 @@ class PerfusionDataSet(DataSet):
 		self.perfusion_param = perfusion_param
 		self.patch_radius = patch_radius
 
-	def load(self, perfusion_param, patch_radius, dt, uniform=False):
+	def load(self, perfusion_param, patch_radius, dt):
 		"""
 		Load memory-mapped files into X array of features and y array of
 		labels.
@@ -76,21 +79,13 @@ class PerfusionDataSet(DataSet):
 			perfusion_param -- string, perfusion parameter
 			patch_radius    -- integer, radius of patch size
 			dt              -- DataType, type of dataset to load data to
-			uniform         -- boolean, data is unformly sampled
 		"""
 
-		if uniform:
-			m = unif_ml.Matrix_loader(self.path_to_unif_dataset)
-			train_X, train_y, val_X, val_y = m.load(
-				perfusion_param,
-				patch_radius
-				)
-		else:
-			m = real_ml.Matrix_loader(self.path_to_real_dataset)
-			train_X, train_y, val_X, val_y = m.load(
-				perfusion_param,
-				patch_radius
-				)
+		m = ml.Matrix_loader(self.path_to_dataset)
+		train_X, train_y, val_X, val_y = m.load(
+			perfusion_param,
+			patch_radius
+			)
 
 		X = list(self.X)
 		y = list(self.y)
@@ -187,6 +182,9 @@ class PerfusionDataSet(DataSet):
 		X = self.X[dt.value]
 		y = self.y[dt.value]
 
+		if X is None or y is None:
+			raise NoDataError()
+
 		if type == 'ctc':
 			# Plot tissue curve with AIF curve
 			self.concentration_time_curve(X, **kwargs)
@@ -216,7 +214,7 @@ class PerfusionDataSet(DataSet):
 				xrange(0, time_interval * X.shape[1], time_interval)
 			]
 			filename = ('stats-' + self.perfusion_param + '_' + 
-						str(self.patch_radius) + str(dt) + '.csv')
+						str(self.patch_radius) + '_' + str(dt) + '.csv')
 			statistics(X, y, filename=filename, **kwargs)
 		else:
 			print 'No such plot exists\n'
