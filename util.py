@@ -185,3 +185,33 @@ def regression_performance(y_true, y_pred, metric):
 		return metrics.r2_score(y_true, y_pred)
 	else:
 		return 0
+
+def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
+	"""
+	Plots a scatterplot of the training score and test score versus a
+	hyperparameter.
+
+	Parameters
+    --------------------
+        h        -- array of length n, values of the hyperparameter
+        train_sc -- array of length n, values of training score
+        test_sc  -- array of length n, values of test score
+	"""
+
+	if 'parameter' not in kwargs:
+		xlabel = 'Hyperparameter'
+	else:
+		xlabel = kwargs.pop('parameter')
+
+	if 'score' not in kwargs:
+		ylabel = 'Performance Score'
+	else:
+		ylabel = kwargs.pop('score')
+
+	plt.scatter(h, train_sc, color='b', marker='x', label='Training')
+	plt.scatter(h, test_sc, color='r', label='Test')
+	plt.legend(loc='upper right', numpoints=1, title='Data Type')
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
+	plt.title(ylabel + ' of Training and Test Vs. ' + xlabel)
+	plt.show()
