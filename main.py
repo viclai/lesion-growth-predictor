@@ -36,10 +36,10 @@ def main():
 		### Enter perfusion parameter ###
 		perfusion_params = p_data.perfusion_params
 		param_val = None
-		param_val_range = [i + 1 for i in xrange(len(perfusion_params) - 1)]
+		param_val_range = [i for i in xrange(len(perfusion_params))]
 		while True:
 			print 'Indicate which perfusion parameter to evaluate.'
-			for i, p in zip(xrange(len(perfusion_params)), perfusion_params):
+			for i, p in enumerate(perfusion_params):
 				print str(i) + ': ' + p
 			param_val = raw_input('Enter value: ')
 			if param_val == controls['Skip']:
@@ -105,11 +105,12 @@ def main():
 		p_data.load(
 			perfusion_params[param_val],
 			patch_rad,
-			PerfusionDataSet.DataType.VALIDATION,
+			PerfusionDataSet.DataType.TEST,
 			)
 
 		if home == True:
 			continue
+		print
 
 		######################################################################
 		# Visualize data
@@ -220,6 +221,7 @@ def main():
 
 		if home == True:
 			continue
+		print
 
 		######################################################################
 		# Run models
@@ -246,6 +248,7 @@ def main():
 
 		if home == True:
 			continue
+		print
 
 		### Passive-Aggressive Regressor ###
 		while True:
@@ -261,10 +264,14 @@ def main():
 				home = True
 				break
 			elif exe == 'Y':
-				run_PA(p_data.X, p_data.y)
+				kwargs = {}
+				kwargs['parameter'] = param_name
+				kwargs['patch_radius'] = patch_rad
+				run_PA(p_data.X, p_data.y, **kwargs)
 				break
 			else:
 				print 'Invalid response. Try again.'
+		print
 
 		while True:
 			resp = raw_input('Run on another data set? [Y/n] ')
@@ -281,6 +288,7 @@ def main():
 				break
 			else:
 				print 'Invalid response. Try again.'
+		print
 
 if __name__ == "__main__" :
 	main()

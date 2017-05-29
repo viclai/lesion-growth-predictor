@@ -101,9 +101,9 @@ class PerfusionDataSet(DataSet):
 			y[dt.value] = val_y
 			self.y = tuple(y)
 		elif dt == self.DataType.TEST:
-			X[dt.value] = train_X
+			X[dt.value] = val_X
 			self.X = tuple(X)
-			y[dt.value] = train_y
+			y[dt.value] = val_y
 			self.y = tuple(y)
 
 		self.perfusion_param = perfusion_param

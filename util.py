@@ -181,7 +181,7 @@ def regression_performance(y_true, y_pred, metric):
 		return metrics.mean_absolute_error(y_true, y_pred)
 	elif metric == "exp-var-score":
 		return metrics.explained_variance_score(y_true, y_pred)
-	elif metric == "r2-score":
+	elif metric == "r2-score": # Can also use score() from the regression model
 		return metrics.r2_score(y_true, y_pred)
 	else:
 		return 0
@@ -189,7 +189,7 @@ def regression_performance(y_true, y_pred, metric):
 def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
 	"""
 	Plots a scatterplot of the training score and test score versus a
-	hyperparameter.
+	hyperparameter. This is helpful for hyperparameter tuning.
 
 	Parameters
     --------------------
@@ -214,4 +214,119 @@ def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
 	plt.xlabel(xlabel)
 	plt.ylabel(ylabel)
 	plt.title(ylabel + ' of Training and Test Vs. ' + xlabel)
-	plt.show()
+	plt.ion()
+	plt.draw()
+	plt.pause(0.001)
+
+def plot_incremental_performance(size, train_sc, test_sc, **kwargs):
+	"""
+	Plots a scatterplot of the training score and test score versus the size
+	of the data trained on. This is helpful for observing the performance of
+	incremental/online models as more data is trained on.
+
+	Parameters
+    --------------------
+        size     -- array of length n, values of increasing sizes
+        train_sc -- array of length n, values of training score
+        test_sc  -- array of length n, values of test score
+	"""
+
+	if 'score' not in kwargs:
+		ylabel = 'Performance Score'
+	else:
+		ylabel = kwargs.pop('score')
+	xlabel = 'Number of Training Examples'
+
+	plt.scatter(size, train_sc, color='b', marker='x', label='Training')
+	plt.scatter(size, test_sc, color='r', label='Test')
+	plt.legend(loc='upper right', numpoints=1, title='Data Type')
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
+	plt.title(ylabel + ' of Training and Test Vs. ' + xlabel)
+	plt.ion()
+	plt.draw()
+	plt.pause(0.001)
+
+def record_results(res, order=None, dir='results'):
+	"""
+	Records results to a CSV file.
+
+	Parameters
+    --------------------
+        res   -- dictionary of column names mapped to a list of their
+        		 respective values
+        order -- array, string values to order the columns by
+        dir   -- string, name of directory to put results in
+	"""
+
+	df = pd.DataFrame(res)
+	if order is not None:
+		df = df[order]
+
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+
+	option_str = [
+		'Do not record',
+		'Write to new file',
+		'Write to existing file',
+	]
+
+	files = [
+		f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))
+	]
+	if len(files) == 0:
+		print 'There are no existing files in ' + dir + '.'
+		options = [0, 1]
+	else:
+		print 'Here is a list of files in ' + dir + ': '
+		for f in files:
+			print '\t' + f
+		options = [0, 1, 2]
+
+	while True:
+		print 'How should the results be recorded?'
+		for o in options:
+			print str(o) + ': ' + option_str[o]
+		resp = raw_input('Enter option number: ')
+		try:
+			val = int(resp)
+			if val not in options:
+				print ('Invalid value. Enter the value corresponding to the '
+					   'option.')
+			else:
+				break
+		except:
+			print ('Invalid value. Enter the value corresponding to the '
+				   'option.')
+
+	if val == 1:
+		filename = raw_input('Enter new file name: ')
+	elif val == 2:
+		while True:
+			filename = raw_input('Enter existing file name: ')
+			file_path = os.path.join(dir, filename)
+			if not os.path.exists(file_path):
+				new_file = raw_input('File does not exist. '
+									 'Create new file? [Y/n] ')
+				if new_file == 'Y':
+					break
+			else:
+				break
+	else:
+		print 'Results were not recorded.'
+		return
+
+	file_path = os.path.join(dir, filename)
+
+	include_header = False
+	if not os.path.exists(file_path):
+		include_header = True
+	df.to_csv(
+		file_path,
+		header=include_header,
+		mode='a',
+		na_rep='N/A',
+		index=False
+		)
+	print 'Results written to ' + file_path + '.'
