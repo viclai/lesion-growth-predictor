@@ -631,6 +631,10 @@ def run_PA(X, y, **kwargs):
 	for a in attributes:
 		results[a] = []
 
+	##########################################################################
+	# Pick parameter values.
+	##########################################################################
+
 	batch_size = 100 # Default
 	size = raw_input('Enter batch size (default: ' +
 					str(batch_size) + '): ')
@@ -827,7 +831,7 @@ def run_PA(X, y, **kwargs):
 
 
 	##########################################################################
-	# Observe performance of model after each batch has been trained on.
+	# Observe performance of model for each batch that has been trained on.
 	##########################################################################
 	resp = raw_input('See incremental performance? [Y/n] ')
 	if resp == 'q':
@@ -855,7 +859,7 @@ def run_PA(X, y, **kwargs):
 			incremental_sizes.append(current_total_data)
 
 			results['Perfusion Parameter'].append(perfusion_param)
-			results['Model'].append('Passive Aggressive')
+			results['Model'].append('PA')
 			results['Patch Radius'].append(patch_radius)
 			results['Batch Size'].append(batch_size)
 			results['C (Regularization)'].append(best_C)
@@ -902,6 +906,13 @@ def run_PA(X, y, **kwargs):
 		record_results(results, attributes, **{
 			'title': 'incremental results'
 			})
+		plot_incremental_performance(
+			incremental_sizes,
+			results['Training MSE'],
+			results['Test MSE'],
+			**{ 'score' : 'Mean Squared Error' }
+			)
+
 		final_result = {}
 		for attr in results:
 			final_result[attr] = [results[attr][-1]]
@@ -943,19 +954,36 @@ def run_PA(X, y, **kwargs):
 				str(final_result['Test R^2 Score'][0]))
 		print
 
-		plot_incremental_performance(
-			incremental_sizes,
-			results['Training MSE'],
-			results['Test MSE'],
-			**{ 'score' : 'Mean Squared Error' }
-			)
-
+	##########################################################################
+	# Observe performance of model with more than 1 epoch.
+	##########################################################################
+	
 	resp = raw_input('See performance with more than one epoch?\n'
 					 'Parameters will remain the same. [Y/n] ')
 	if resp == 'q':
 		return
 	if resp == 'Y':
 		print 'Tuning number of epochs...'
+
+		# Initialize final result object
+		final_result = {}
+		for a in attributes:
+			final_result[a] = []
+		final_result['Perfusion Parameter'].append(perfusion_param)
+		final_result['Model'].append('PA')
+		final_result['Patch Radius'].append(patch_radius)
+		final_result['Batch Size'].append(batch_size)
+		final_result['C (Regularization)'].append(best_C)
+		final_result['Epsilon'].append(best_epsilon)
+		final_result['Fit Intercept?'].append(intercept)
+		final_result['Shuffle?'].append(shuffle)
+		final_result['Random Seed'].append(seed)
+		final_result['Loss Function'].append(loss)
+		final_result['Warm Start?'].append(False)
+		final_result['Total Number of Examples Trained'].append(
+			total_training_instances
+			)
+
 		while True:
 			comp = raw_input('Compare errors for range of epoch values? [Y/n] ')
 			if comp == 'Y':
@@ -1029,9 +1057,9 @@ def run_PA(X, y, **kwargs):
 		if n_iter != '':
 			best_n_iter = int(n_iter)
 
-		########################################
+		######################################################################
 		# Train model with multiple epochs
-		########################################
+		######################################################################
 		np.random.seed(seed)
 		model = PassiveAggressiveRegressor(
 			C=best_C,
@@ -1054,13 +1082,13 @@ def run_PA(X, y, **kwargs):
 			y_pred,
 			'mse'
 			)
-		final_result['Training MSE'] = [overall_train_perf]
+		final_result['Training MSE'].append(overall_train_perf)
 		overall_train_perf = regression_performance(
 			y[0].A1,
 			y_pred,
 			'r2-score'
 			)
-		final_result['Training R^2 Score'] = [overall_train_perf]
+		final_result['Training R^2 Score'].append(overall_train_perf)
 
 		# Compute test performance using test data
 		y_pred = model.predict(X[2])
@@ -1069,15 +1097,17 @@ def run_PA(X, y, **kwargs):
 			y_pred,
 			'mse'
 			)
-		final_result['Test MSE'] = [test_perf]
+		final_result['Test MSE'].append(test_perf)
 		test_perf = regression_performance(
 			y[2].A1,
 			y_pred,
 			'r2-score'
 			)
-		final_result['Test R^2 Score'] = [test_perf]
+		final_result['Test R^2 Score'].append(test_perf)
 		final_result['Epochs'] = [best_n_iter]
 
+		if 'Epochs' not in attributes:
+			attributes.append('Epochs')
 		record_results(final_result, attributes, **{
 			'title': 'final results'
 			})
