@@ -193,9 +193,9 @@ def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
 
 	Parameters
     --------------------
-        h        -- array of length n, values of the hyperparameter
-        train_sc -- array of length n, values of training score
-        test_sc  -- array of length n, values of test score
+        h        -- list of length n, values of the hyperparameter
+        train_sc -- list of length n, values of training score
+        test_sc  -- list of length n, values of test score
 	"""
 
 	if 'parameter' not in kwargs:
@@ -226,9 +226,9 @@ def plot_incremental_performance(size, train_sc, test_sc, **kwargs):
 
 	Parameters
     --------------------
-        size     -- array of length n, values of increasing sizes
-        train_sc -- array of length n, values of training score
-        test_sc  -- array of length n, values of test score
+        size     -- list of length n, values of increasing sizes
+        train_sc -- list of length n, values of training score
+        test_sc  -- list of length n, values of test score
 	"""
 
 	if 'score' not in kwargs:
@@ -247,7 +247,7 @@ def plot_incremental_performance(size, train_sc, test_sc, **kwargs):
 	plt.draw()
 	plt.pause(0.001)
 
-def record_results(res, order=None, dir='results'):
+def record_results(res, order=None, dir='results', **kwargs):
 	"""
 	Records results to a CSV file.
 
@@ -255,9 +255,14 @@ def record_results(res, order=None, dir='results'):
     --------------------
         res   -- dictionary of column names mapped to a list of their
         		 respective values
-        order -- array, string values to order the columns by
+        order -- list of strings, values to order the columns by
         dir   -- string, name of directory to put results in
 	"""
+
+	if 'title' not in kwargs:
+		name = 'results'
+	else:
+		name = kwargs.pop('title')
 
 	df = pd.DataFrame(res)
 	if order is not None:
@@ -285,7 +290,7 @@ def record_results(res, order=None, dir='results'):
 		options = [0, 1, 2]
 
 	while True:
-		print 'How should the results be recorded?'
+		print 'How should the ' + name + ' be recorded?'
 		for o in options:
 			print str(o) + ': ' + option_str[o]
 		resp = raw_input('Enter option number: ')
@@ -314,7 +319,7 @@ def record_results(res, order=None, dir='results'):
 			else:
 				break
 	else:
-		print 'Results were not recorded.'
+		print name.title() + ' not recorded.'
 		return
 
 	file_path = os.path.join(dir, filename)
@@ -329,4 +334,4 @@ def record_results(res, order=None, dir='results'):
 		na_rep='N/A',
 		index=False
 		)
-	print 'Results written to ' + file_path + '.'
+	print name.title() + ' written to ' + file_path + '.'

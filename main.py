@@ -38,7 +38,7 @@ def main():
 		param_val = None
 		param_val_range = [i for i in xrange(len(perfusion_params))]
 		while True:
-			print 'Indicate which perfusion parameter to evaluate.'
+			print 'Enter which perfusion parameter to evaluate.'
 			for i, p in enumerate(perfusion_params):
 				print str(i) + ': ' + p
 			param_val = raw_input('Enter value: ')
@@ -73,7 +73,7 @@ def main():
 		patch_rad = None
 		patch_rad_range = [i for i in xrange(7)]
 		while True:
-			patch_rad = raw_input('Indicate patch radius (0-6): ')
+			patch_rad = raw_input('Enter patch radius (0-6): ')
 			if patch_rad == controls['Skip']:
 				print 'Patch radius is required.'
 			elif patch_rad == controls['Quit']:
@@ -252,7 +252,7 @@ def main():
 
 		### Passive-Aggressive Regressor ###
 		while True:
-			exe = raw_input('Run Passive-Aggressive? [Y/n] ')
+			exe = raw_input('Run Passive-Aggressive (PA)? [Y/n] ')
 			if exe == 'n' or exe == controls['Skip']:
 				break
 			elif exe == controls['Quit']:
