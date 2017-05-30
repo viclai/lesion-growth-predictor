@@ -241,7 +241,10 @@ def main():
 				home = True
 				break
 			elif exe == 'Y':
-				run_SGD(p_data.X, p_data.y)
+				kwargs = {}
+				kwargs['parameter'] = param_name
+				kwargs['patch_radius'] = patch_rad
+				run_SGD(p_data.X, p_data.y, **kwargs)
 				break
 			else:
 				print 'Invalid response. Try again.'
