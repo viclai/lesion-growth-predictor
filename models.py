@@ -491,7 +491,7 @@ def run_SGD(X, y, **kwargs):
 		########################################
 		np.random.seed(seed)
 		model = SGDRegressor(
-			average=avg_pick,
+			average=sgd_average,
 			penalty=best_penalty,
 			alpha=best_alpha,
 			epsilon=best_epsilon,
