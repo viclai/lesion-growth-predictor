@@ -423,21 +423,21 @@ def run_SGD(X, y, **kwargs):
 			final_result[a] = []
 		
 		results['Perfusion Parameter'].append(perfusion_param)
-			results['Model'].append('SGD')
-			results['Patch Radius'].append(patch_radius)
-			results['Batch Size'].append(batch_size)
-			results['Penalty (Regularization)'].append('l2')
-			results['Alpha'].append(best_alpha)
-			results['Average'].append(sgd_average)
-			results['Epsilon'].append(best_epsilon)
-			results['Fit Intercept?'].append(intercept)
-			results['Shuffle?'].append(shuffle)
-			results['Random Seed'].append(seed)
-			results['Loss Function'].append(loss)
-			results['Warm Start?'].append(False)
-			results['Total Number of Examples Trained'].append(
-				total_training_instances
-				)
+		results['Model'].append('SGD')
+		results['Patch Radius'].append(patch_radius)
+		results['Batch Size'].append(batch_size)
+		results['Penalty (Regularization)'].append('l2')
+		results['Alpha'].append(best_alpha)
+		results['Average'].append(sgd_average)
+		results['Epsilon'].append(best_epsilon)
+		results['Fit Intercept?'].append(intercept)
+		results['Shuffle?'].append(shuffle)
+		results['Random Seed'].append(seed)
+		results['Loss Function'].append(loss)
+		results['Warm Start?'].append(False)
+		results['Total Number of Examples Trained'].append(
+			total_training_instances
+		)
 				
 		
 		while True:
