@@ -645,8 +645,8 @@ def run_PA(X, y, **kwargs):
 		'Patch Radius',
 		'Batch Size',
 		'Total Number of Examples Trained',
-		'Training MSE',
-		'Test MSE',
+		'Training RMSE',
+		'Test RMSE',
 		'Training R^2 Score',
 		'Test R^2 Score',
 		'C (Regularization)', # Aggressiveness
@@ -726,13 +726,13 @@ def run_PA(X, y, **kwargs):
 					train_perf.append(regression_performance(
 						y_train,
 						y_pred,
-						'mse'
+						'rms'
 						))
 					y_pred = model.predict(X_val)
 					val_perf.append(regression_performance(
 						y_val,
 						y_pred,
-						'mse'
+						'rms'
 						))
 				avg_train_perf.append(
 					np.sum(train_perf) * 1.0 / len(train_perf)
@@ -746,7 +746,7 @@ def run_PA(X, y, **kwargs):
 				avg_val_perf,
 				**{
 					'parameter' : r'Regularization $C$',
-					'score' : 'Mean Squared Error'
+					'score' : 'Root Mean Squared Error'
 				})
 		elif comp == 'q':
 			return
@@ -794,13 +794,13 @@ def run_PA(X, y, **kwargs):
 					train_perf.append(regression_performance(
 						y_train,
 						y_pred,
-						'mse'
+						'rms'
 						))
 					y_pred = model.predict(X_val)
 					val_perf.append(regression_performance(
 						y_val,
 						y_pred,
-						'mse'
+						'rms'
 						))
 				avg_train_perf.append(
 					np.sum(train_perf) * 1.0 / len(train_perf)
@@ -814,7 +814,7 @@ def run_PA(X, y, **kwargs):
 				avg_val_perf,
 				**{
 					'parameter' : r'Epsilon $\epsilon$',
-					'score' : 'Mean Squared Error'
+					'score' : 'Root Mean Squared Error'
 				})
 		elif comp == 'q':
 			return
@@ -854,9 +854,9 @@ def run_PA(X, y, **kwargs):
 	print '1: Epsilon Insensitive (PA-I)'
 	print '2: Squared Epsilon Insensitive (PA-II)'
 	pick_loss = raw_input('Enter value (default: 1): ')
-	if epsilon_pick == 'q':
+	if pick_loss == 'q':
 		return
-	if pick_loss == 2:
+	if pick_loss == '2':
 		loss = 'squared_epsilon_insensitive'
 
 
@@ -908,9 +908,9 @@ def run_PA(X, y, **kwargs):
 			overall_train_perf = regression_performance(
 				y[0].A1,
 				y_pred,
-				'mse'
+				'rms'
 				)
-			results['Training MSE'].append(overall_train_perf)
+			results['Training RMSE'].append(overall_train_perf)
 			overall_train_perf = regression_performance(
 				y[0].A1,
 				y_pred,
@@ -923,9 +923,9 @@ def run_PA(X, y, **kwargs):
 			test_perf = regression_performance(
 				y[2].A1,
 				y_pred,
-				'mse'
+				'rms'
 				)
-			results['Test MSE'].append(test_perf)
+			results['Test RMSE'].append(test_perf)
 			test_perf = regression_performance(
 				y[2].A1,
 				y_pred,
@@ -938,9 +938,9 @@ def run_PA(X, y, **kwargs):
 			})
 		plot_incremental_performance(
 			incremental_sizes,
-			results['Training MSE'],
-			results['Test MSE'],
-			**{ 'score' : 'Mean Squared Error' }
+			results['Training RMSE'],
+			results['Test RMSE'],
+			**{ 'score' : 'Root Mean Squared Error' }
 			)
 
 		final_result = {}
@@ -973,14 +973,14 @@ def run_PA(X, y, **kwargs):
 		print '----------------'
 		print 'Results'
 		print '----------------'
-		print 'Number of Epochs                 : 1'
-		print ('Final Training Mean Squared Error: ' +
-				str(final_result['Training MSE'][0]))
-		print ('Final Training R^2 Score         : ' +
+		print 'Number of Epochs                      : 1'
+		print ('Final Training Root Mean Squared Error: ' +
+				str(final_result['Training RMSE'][0]))
+		print ('Final Training R^2 Score              : ' +
 				str(final_result['Training R^2 Score'][0]))
-		print ('Final Test Mean Squared Error    : ' +
-				str(final_result['Test MSE'][0]))
-		print ('Final Test R^2 Score             : ' +
+		print ('Final Test Root Mean Squared Error    : ' +
+				str(final_result['Test RMSE'][0]))
+		print ('Final Test R^2 Score                  : ' +
 				str(final_result['Test R^2 Score'][0]))
 		print
 
@@ -1024,9 +1024,15 @@ def run_PA(X, y, **kwargs):
 				avg_train_perf = []
 				avg_val_perf = []
 
+				np.random.seed(seed)
 				for n in n_range:
 					train_perf = []
 					val_perf = []
+
+					if shuffle:
+						np.random.shuffle(indices)
+						train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
+						outcomes = np.matrix([[y[0].A1[i]] for i in indices])
 
 					# Use cross validation to tune parameter
 					kf = KFold()
@@ -1052,13 +1058,13 @@ def run_PA(X, y, **kwargs):
 						train_perf.append(regression_performance(
 							y_train,
 							y_pred,
-							'mse'
+							'rms'
 							))
 						y_pred = model.predict(X_val)
 						val_perf.append(regression_performance(
 							y_val,
 							y_pred,
-							'mse'
+							'rms'
 							))
 					avg_train_perf.append(
 						np.sum(train_perf) * 1.0 / len(train_perf)
@@ -1072,7 +1078,7 @@ def run_PA(X, y, **kwargs):
 					avg_val_perf,
 					**{
 						'parameter' : r'Epochs',
-						'score' : 'Mean Squared Error'
+						'score' : 'Root Mean Squared Error'
 					})
 			elif comp == 'q':
 				return
@@ -1100,6 +1106,10 @@ def run_PA(X, y, **kwargs):
 			loss=loss,
 			)
 		for rnd in xrange(best_n_iter):
+			if shuffle:
+				np.random.shuffle(indices)
+				train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
+				outcomes = np.matrix([[y[0].A1[i]] for i in indices])
 			for i in xrange(0, total_training_instances, batch_size):
 				data = train_data[i:i + batch_size]
 				out = outcomes[i:i + batch_size]
@@ -1110,9 +1120,9 @@ def run_PA(X, y, **kwargs):
 		overall_train_perf = regression_performance(
 			y[0].A1,
 			y_pred,
-			'mse'
+			'rms'
 			)
-		final_result['Training MSE'].append(overall_train_perf)
+		final_result['Training RMSE'].append(overall_train_perf)
 		overall_train_perf = regression_performance(
 			y[0].A1,
 			y_pred,
@@ -1125,9 +1135,9 @@ def run_PA(X, y, **kwargs):
 		test_perf = regression_performance(
 			y[2].A1,
 			y_pred,
-			'mse'
+			'rms'
 			)
-		final_result['Test MSE'].append(test_perf)
+		final_result['Test RMSE'].append(test_perf)
 		test_perf = regression_performance(
 			y[2].A1,
 			y_pred,
@@ -1162,12 +1172,12 @@ def run_PA(X, y, **kwargs):
 		print '----------------'
 		print 'Results'
 		print '----------------'
-		print 'Number of Epochs                 : ' + str(best_n_iter)
-		print ('Final Training Mean Squared Error: ' +
-				str(final_result['Training MSE'][0]))
-		print ('Final Training R^2 Score         : ' +
+		print 'Number of Epochs                      : ' + str(best_n_iter)
+		print ('Final Training Root Mean Squared Error: ' +
+				str(final_result['Training RMSE'][0]))
+		print ('Final Training R^2 Score              : ' +
 				str(final_result['Training R^2 Score'][0]))
-		print ('Final Test Mean Squared Error    : ' +
-				str(final_result['Test MSE'][0]))
-		print ('Final Test R^2 Score             : ' +
+		print ('Final Test Root Mean Squared Error    : ' +
+				str(final_result['Test RMSE'][0]))
+		print ('Final Test R^2 Score                  : ' +
 				str(final_result['Test R^2 Score'][0]))

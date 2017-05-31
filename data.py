@@ -5,7 +5,6 @@ from util import two_dimensional_slices, label_distribution, \
 				 scatter_matrix, statistics
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 
 class NoDataError(Exception):
 	def __init__(self, msg='No data loaded'):
@@ -141,7 +140,7 @@ class PerfusionDataSet(DataSet):
 
 	def tissue_curve(self, dt, **kwargs):
 		"""
-		Plots the CTC of the AIF for each instance.
+		Plots the CTC for each instance.
 
 		Parameters
 		--------------------

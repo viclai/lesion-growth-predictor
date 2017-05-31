@@ -183,6 +183,8 @@ def regression_performance(y_true, y_pred, metric):
 		return metrics.explained_variance_score(y_true, y_pred)
 	elif metric == "r2-score": # Can also use score() from the regression model
 		return metrics.r2_score(y_true, y_pred)
+	elif metric == "rms":
+		return np.sqrt([metrics.mean_squared_error(y_true, y_pred)])[0]
 	else:
 		return 0
 
