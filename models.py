@@ -67,9 +67,11 @@ def run_SGD(X, y, **kwargs):
 		'Loss Function',
 		'Warm Start?',
 		'Average'
-	]
+	] ## might add/ change one of these attributes
+	# eta0 , learning_rate (learning rate schedule), power_t (for inv scaling learning rate)
 	best_penalty = 'elasticnet'
 	
+	# Pick values for parameters
 	results = {}
 	for a in attributes:
 		results[a] = []
@@ -278,7 +280,7 @@ def run_SGD(X, y, **kwargs):
 
 
 	##########################################################################
-	# Observe performance of model after each batch has been trained on.
+	# Observe performance of model for each batch that has been trained on.
 	##########################################################################
 	resp = raw_input('See incremental performance? [Y/n] ')
 	if resp == 'q':
@@ -308,7 +310,7 @@ def run_SGD(X, y, **kwargs):
 			incremental_sizes.append(current_total_data)
 
 			results['Perfusion Parameter'].append(perfusion_param)
-			results['Model'].append('Stochastic Gradient Descent')
+			results['Model'].append('SGD')
 			results['Patch Radius'].append(patch_radius)
 			results['Batch Size'].append(batch_size)
 			results['Penalty (Regularization)'].append('l2')
@@ -357,6 +359,14 @@ def run_SGD(X, y, **kwargs):
 		record_results(results, attributes, **{
 			'title': 'incremental results'
 			})
+			
+		plot_incremental_performance(
+			incremental_sizes,
+			results['Training MSE'],
+			results['Test MSE'],
+			**{ 'score' : 'Mean Squared Error' }
+			)
+			
 		final_result = {}
 		for attr in results:
 			final_result[attr] = [results[attr][-1]]
@@ -400,19 +410,36 @@ def run_SGD(X, y, **kwargs):
 				str(final_result['Test R^2 Score'][0]))
 		print
 
-		plot_incremental_performance(
-			incremental_sizes,
-			results['Training MSE'],
-			results['Test MSE'],
-			**{ 'score' : 'Mean Squared Error' }
-			)
-
+		# Observe performance of model with more than 1 epoch.
+		
 	resp = raw_input('See performance with more than one epoch?\n'
 					 'Parameters will remain the same. [Y/n] ')
 	if resp == 'q':
 		return
 	if resp == 'Y':
 		print 'Tuning number of epochs...'
+		final_result = {}
+		for a in attributes:
+			final_result[a] = []
+		
+		results['Perfusion Parameter'].append(perfusion_param)
+			results['Model'].append('SGD')
+			results['Patch Radius'].append(patch_radius)
+			results['Batch Size'].append(batch_size)
+			results['Penalty (Regularization)'].append('l2')
+			results['Alpha'].append(best_alpha)
+			results['Average'].append(sgd_average)
+			results['Epsilon'].append(best_epsilon)
+			results['Fit Intercept?'].append(intercept)
+			results['Shuffle?'].append(shuffle)
+			results['Random Seed'].append(seed)
+			results['Loss Function'].append(loss)
+			results['Warm Start?'].append(False)
+			results['Total Number of Examples Trained'].append(
+				total_training_instances
+				)
+				
+		
 		while True:
 			comp = raw_input('Compare errors for range of epoch values? [Y/n] ')
 			if comp == 'Y':
@@ -513,13 +540,13 @@ def run_SGD(X, y, **kwargs):
 			y_pred,
 			'mse'
 			)
-		final_result['Training MSE'] = [overall_train_perf]
+		final_result['Training MSE'].append(overall_train_perf)
 		overall_train_perf = regression_performance(
 			y[0].A1,
 			y_pred,
 			'r2-score'
 			)
-		final_result['Training R^2 Score'] = [overall_train_perf]
+		final_result['Training R^2 Score'].append(overall_train_perf)
 
 		# Compute test performance using test data
 		y_pred = model.predict(X[2])
@@ -528,14 +555,17 @@ def run_SGD(X, y, **kwargs):
 			y_pred,
 			'mse'
 			)
-		final_result['Test MSE'] = [test_perf]
+		final_result['Test MSE'].append(test_perf)
 		test_perf = regression_performance(
 			y[2].A1,
 			y_pred,
 			'r2-score'
 			)
-		final_result['Test R^2 Score'] = [test_perf]
+		final_result['Test R^2 Score'].append(test_perf)
 		final_result['Epochs'] = [best_n_iter]
+		
+		if 'Epochs' not in attributes:
+			attributes.append('Epochs')
 
 		record_results(final_result, attributes, **{
 			'title': 'final results'
