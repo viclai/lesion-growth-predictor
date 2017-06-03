@@ -158,7 +158,7 @@ def run_SGD(X, y, **kwargs):
 				avg_val_perf,
 				**{
 					'parameter' : r'Regularization l2 with multiplier $alpha$',
-					'score' : 'Mean Squared Error'
+					'score' : 'Root Mean Squared Error'
 				})
 		elif comp == 'q':
 			return
