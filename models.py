@@ -267,15 +267,21 @@ def run_SGD(X, y, **kwargs):
 	if avg_pick == 'Y':
 		sgd_average = True
 
-	# loss: 'epsilon_insensitive', 'squared_epsilon_insensitive'
-	loss = 'epsilon_insensitive' # Default
+	# loss: 'squared_loss', 'huber', 'epsilon_insensitive', or 'squared_epsilon_insensitive'
+	loss = 'squared_loss' # Default
 	print 'Choose a loss function to be used.'
-	print '1: Epsilon Insensitive (PA-I)'
-	print '2: Squared Epsilon Insensitive (PA-II)'
+	print '1: Squared Loss'
+	print '2: Huber'
+	print '3: Epsilon Insensitive'
+	print '4: Squared Epsilon Insensitive'
 	pick_loss = raw_input('Enter value (default: 1): ')
-	if epsilon_pick == 'q':
+	if pick_loss == 'q':
 		return
-	if pick_loss == '2':
+	elif pick_loss == '2':
+		loss = 'huber'
+	elif pick_loss == '3':
+		loss = 'epsilon_insensitive'
+	elif pick_loss == '4':
 		loss = 'squared_epsilon_insensitive'
 
 
@@ -399,7 +405,7 @@ def run_SGD(X, y, **kwargs):
 		print '----------------'
 		print 'Results'
 		print '----------------'
-		print 'Number of Epochs                      : ' + str(best_n_iter)
+		print 'Number of Epochs                      : 1'
 		print ('Final Training Root Mean Squared Error: ' +
 				str(final_result['Training RMSE'][0]))
 		print ('Final Training R^2 Score              : ' +
@@ -408,6 +414,7 @@ def run_SGD(X, y, **kwargs):
 				str(final_result['Test RMSE'][0]))
 		print ('Final Test R^2 Score                  : ' +
 				str(final_result['Test R^2 Score'][0]))
+		print
 
 		# Observe performance of model with more than 1 epoch.
 		
