@@ -23,10 +23,10 @@ def print_controls():
 	print
 
 def main():
+	print 'Welcome to Lesion Growth Predictor!'
+	print_controls()
 	while True:
 		home = False
-		print 'Welcome to Lesion Growth Predictor!'
-		print_controls()
 
 		######################################################################
 		# Load data

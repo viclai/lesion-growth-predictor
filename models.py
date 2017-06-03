@@ -691,8 +691,7 @@ def run_PA(X, y, **kwargs):
 	# Enter a seed in order to reproduce results (even if the shuffle option
 	# is not set to True)
 	seed = None # Default
-	pick_seed = raw_input('Enter seed of random number generator to '
-						  'shuffle: ')
+	pick_seed = raw_input('Enter seed for random number generator: ')
 	if pick_seed == 'q':
 		return
 	if pick_seed != '':

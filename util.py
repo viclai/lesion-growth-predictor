@@ -2,9 +2,12 @@ from collections import defaultdict
 from sklearn import metrics
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 import pandas as pd
 import os
 import math
+import sys
 
 # Functions to visualize data, plot graphs, and evaluate models go here.
 
@@ -31,9 +34,9 @@ def scatter_matrix(X, **kwargs):
 	pd.scatter_matrix(df)
 	plt.show()
 
-def correlation_matrix(X, y):
+def pca_plot(X, y):
 	"""
-	Plots a correlation matrix of the data.
+	Perform dimensionality reduction to visualize multi-dimensional input.
 
 	Parameters
 	--------------------
@@ -210,6 +213,7 @@ def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
 	else:
 		ylabel = kwargs.pop('score')
 
+	plt.clf()
 	plt.scatter(h, train_sc, color='b', marker='x', label='Training')
 	plt.scatter(h, test_sc, color='r', label='Test')
 	plt.legend(loc='upper right', numpoints=1, title='Data Type')
@@ -239,6 +243,7 @@ def plot_incremental_performance(size, train_sc, test_sc, **kwargs):
 		ylabel = kwargs.pop('score')
 	xlabel = 'Number of Training Examples'
 
+	plt.clf()
 	plt.scatter(size, train_sc, color='b', marker='x', label='Training')
 	plt.scatter(size, test_sc, color='r', label='Test')
 	plt.legend(loc='upper right', numpoints=1, title='Data Type')
@@ -337,3 +342,93 @@ def record_results(res, order=None, dir='results', **kwargs):
 		index=False
 		)
 	print name.title() + ' written to ' + file_path + '.'
+
+def plot_from_csv(filepath, split, attr, **kwargs):
+	"""
+	Displays a scatterplot from a CSV file.
+
+	Parameters
+    --------------------
+        filepath -- path to CSV
+        split    -- string, attribute (column) to split on
+        attr     -- list of strings, values of attributes to plot
+	"""
+
+	"""
+	Add more markers and/or colors if needed.
+	Google 'matplotlib markers' and 'matplotlib colors'.
+	"""
+	markers = ['x', 'o']
+	colors = ['b', 'r']
+
+	if 'title' not in kwargs:
+		title = ''
+	else:
+		title = kwargs.pop('title')
+
+	if 'ylabel' not in kwargs:
+		ylabel = 'y'
+	else:
+		ylabel = kwargs.pop('ylabel')
+
+	try:
+		df = pd.read_csv(filepath)
+	except IOError:
+		sys.stderr.write('Unknown file path\n')
+		sys.exit()
+
+	categories = df[split].unique()
+	one_class = len(categories) == 1
+	patches = []
+	lines = []
+
+	plt.clf()
+	ax = plt.subplot(111)
+	for i, category in enumerate(categories):
+		patches.append(mpatches.Patch(color=colors[i], label=category))
+		cur_df = df.loc[df[split] == category]
+		d = cur_df.to_dict('list')
+
+		x = d[attr[0]]
+		for j, a in enumerate(attr[1:]):
+			if one_class:
+				color = colors[j]
+			else:
+				color = colors[i]
+			ax.scatter(x, d[a], color=color, marker=markers[j], label=a)
+
+			if i == 0:
+				lines.append(mlines.Line2D(
+					[],
+					[],
+					color='k',
+					marker=markers[j],
+					label=a
+					))
+
+	# Shrink current axis by 20%
+	box = ax.get_position()
+	ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+	if not one_class:
+		class_legend = ax.legend(
+			loc='lower left',
+			fontsize=8,
+			numpoints=1,
+			handles=patches,
+			bbox_to_anchor=(1, 0.25)
+			)
+		plt.gca().add_artist(class_legend)
+	ax.legend(
+		loc='center left',
+		fontsize=8,
+		numpoints=1,
+		handles=lines,
+		bbox_to_anchor=(1, 0.75)
+		)
+	plt.xlabel(attr[0])
+	plt.ylabel(ylabel)
+	plt.title(title)
+	plt.ion()
+	plt.draw()
+	plt.pause(0.001)

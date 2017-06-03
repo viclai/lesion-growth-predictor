@@ -16,7 +16,7 @@ Scalzo's lab team.
 
 # Development
 Functionality has been implemented to load the data from the dataset (not
-included). Tools to visualize the data has also been created to look for any
+included). Tools to visualize the data have also been created to look for any
 funny values or outliers, examine a range of values more closely, and figure
 out which features seem important. In addition, methods to help tune
 hyperparameters and record results have been fully implemented.
@@ -29,7 +29,7 @@ evaluated.
 # Installation
 Download or clone this repository. 
 
-Make sure Python 2.7 or above is installed on your machine. The following 
+Make sure Python **2.x** is installed on your machine. The following 
 packages are used in the scripts.
 
 * [numpy](http://www.numpy.org/)
