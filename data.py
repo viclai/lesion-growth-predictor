@@ -18,10 +18,10 @@ class DataSet:
 
 	def __init__(self, X=(None, None, None), y=(None, None, None)):
 		"""
-        Data class.
+		Data class.
         
-        Attributes
-        --------------------
+		Attributes
+		--------------------
 			X -- tuple of length 3, 
 				1. numpy matrix of shape (n_1,d), features for training
 				2. numpy matrix of shape (n_2,d), features for validation
@@ -30,7 +30,7 @@ class DataSet:
 				1. numpy matrix of shape (n_1,1), targets for training
 				2. numpy matrix of shape (n_2,1), targets for validation
 				3. numpy matrix of shape (n_3,1), targets for test
-        """
+		"""
 
 		# n = number of examples, d = dimensionality
 		self.X = X
@@ -56,13 +56,13 @@ class PerfusionDataSet(DataSet):
 
 	def __init__(self, perfusion_param=None, patch_radius=None):
 		"""
-        PerfusionData class.
+		PerfusionData class.
 
-        Attributes
-        --------------------
-            perfusion_param -- string, perfusion parameter
-            patch_radius    -- integer, patch radius
-        """
+		Attributes
+		--------------------
+			perfusion_param -- string, perfusion parameter
+			patch_radius    -- integer, patch radius
+		"""
 
 		DataSet.__init__(self)
 		self.perfusion_param = perfusion_param

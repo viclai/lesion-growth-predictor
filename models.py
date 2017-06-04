@@ -5,6 +5,7 @@ from sklearn.model_selection import KFold
 import numpy as np
 import pandas as pd
 import os
+import copy
 
 """
 Steps to evaluate a ML technique:
@@ -1039,14 +1040,19 @@ def run_PA(X, y, **kwargs):
 				avg_val_perf = []
 
 				np.random.seed(seed)
+				indices_copy = copy.deepcopy(indices)
 				for n in n_range:
 					train_perf = []
 					val_perf = []
 
 					if shuffle:
-						np.random.shuffle(indices)
-						train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
-						outcomes = np.matrix([[y[0].A1[i]] for i in indices])
+						np.random.shuffle(indices_copy)
+						train_data = np.matrix(
+							[np.asarray(X[0])[i] for i in indices_copy]
+							)
+						outcomes = np.matrix(
+							[[y[0].A1[i]] for i in indices_copy]
+							)
 
 					# Use cross validation to tune parameter
 					kf = KFold()

@@ -18,7 +18,6 @@ def scatter_matrix(X, **kwargs):
 	Parameters
 	--------------------
 		X -- numpy matrix of shape (n,d), features
-
 	"""
 
 	indexes = ['Example ' + str(i + 1) for i in xrange(X.shape[0])]
@@ -55,7 +54,6 @@ def two_dimensional_slices(X, y, **kwargs):
 	--------------------
 		X -- numpy matrix of shape (n,d), features
 		y -- numpy matrix of shape (n,1), targets
-
 	"""
 
 	if 'color' not in kwargs:
@@ -163,20 +161,20 @@ def statistics(X, y, filename='stats.csv', **kwargs):
 
 def regression_performance(y_true, y_pred, metric):
 	"""
-    Calculates the performance metric based on the agreement between the 
-    true labels and the predicted labels.
+	Calculates the performance metric based on the agreement between the 
+	true labels and the predicted labels.
     
-    Parameters
-    --------------------
-        y_true -- numpy array of shape (n,), known labels
-        y_pred -- numpy array of shape (n,), (continuous-valued) predictions
-        metric -- string, option used to select the performance measure
-                  options: 'mse', 'f1-mae', 'exp-var-score', 'r2-score'
+	Parameters
+	--------------------
+		y_true -- numpy array of shape (n,), known labels
+		y_pred -- numpy array of shape (n,), (continuous-valued) predictions
+		metric -- string, option used to select the performance measure
+				  options: 'mse', 'f1-mae', 'exp-var-score', 'r2-score', 'rms'
     
-    Returns
-    --------------------
-        score  -- float, performance score
-    """
+	Returns
+	--------------------
+		score  -- float, performance score
+	"""
 
 	if metric == "mse":
 		return metrics.mean_squared_error(y_true, y_pred)
@@ -198,9 +196,9 @@ def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
 
 	Parameters
     --------------------
-        h        -- list of length n, values of the hyperparameter
-        train_sc -- list of length n, values of training score
-        test_sc  -- list of length n, values of test score
+		h        -- list of length n, values of the hyperparameter
+		train_sc -- list of length n, values of training score
+		test_sc  -- list of length n, values of test score
 	"""
 
 	if 'parameter' not in kwargs:
@@ -232,9 +230,9 @@ def plot_incremental_performance(size, train_sc, test_sc, **kwargs):
 
 	Parameters
     --------------------
-        size     -- list of length n, values of increasing sizes
-        train_sc -- list of length n, values of training score
-        test_sc  -- list of length n, values of test score
+		size     -- list of length n, values of increasing sizes
+		train_sc -- list of length n, values of training score
+		test_sc  -- list of length n, values of test score
 	"""
 
 	if 'score' not in kwargs:
@@ -260,10 +258,10 @@ def record_results(res, order=None, dir='results', **kwargs):
 
 	Parameters
     --------------------
-        res   -- dictionary of column names mapped to a list of their
+		res   -- dictionary of column names mapped to a list of their
         		 respective values
-        order -- list of strings, values to order the columns by
-        dir   -- string, name of directory to put results in
+		order -- list of strings, values to order the columns by
+		dir   -- string, name of directory to put results in
 	"""
 
 	if 'title' not in kwargs:
@@ -343,15 +341,15 @@ def record_results(res, order=None, dir='results', **kwargs):
 		)
 	print name.title() + ' written to ' + file_path + '.'
 
-def plot_from_csv(filepath, split, attr, **kwargs):
+def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 	"""
-	Displays a scatterplot from a CSV file.
+	Displays a scatter plot from a CSV file.
 
 	Parameters
-    --------------------
-        filepath -- path to CSV
-        split    -- string, attribute (column) to split on
-        attr     -- list of strings, values of attributes to plot
+	--------------------
+		filepath -- path to CSV
+		split    -- string, attribute (column) to split on
+		attr     -- list of strings, values of attributes to plot
 	"""
 
 	"""
@@ -416,8 +414,10 @@ def plot_from_csv(filepath, split, attr, **kwargs):
 			fontsize=8,
 			numpoints=1,
 			handles=patches,
-			bbox_to_anchor=(1, 0.25)
+			bbox_to_anchor=(1, 0.25),
+			title=split
 			)
+		class_legend.get_title().set_fontsize('8')
 		plt.gca().add_artist(class_legend)
 	ax.legend(
 		loc='center left',
@@ -427,6 +427,67 @@ def plot_from_csv(filepath, split, attr, **kwargs):
 		bbox_to_anchor=(1, 0.75)
 		)
 	plt.xlabel(attr[0])
+	plt.ylabel(ylabel)
+	plt.title(title)
+	plt.ion()
+	plt.draw()
+	plt.pause(0.001)
+
+def histogram_from_csv(filepath, split, xlabel, ylabel, **kwargs):
+	"""
+	Displays a histogram (bar graph) from a CSV file.
+
+	Parameters
+	--------------------
+		filepath -- path to CSV
+		split    -- string, attribute (column) to split on
+		xlabel   -- string, label of horizontal axis
+		ylabel   -- string, label of vertical axis
+	"""
+
+	# Add more colors if needed. Google 'matplotlib colors'.
+	colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
+
+	if 'title' not in kwargs:
+		title = ''
+	else:
+		title = kwargs.pop('title')
+
+	try:
+		df = pd.read_csv(filepath)
+	except IOError:
+		sys.stderr.write('Unknown file path\n')
+		sys.exit()
+
+	categories = df[split].unique()
+	labels = df[xlabel].unique()
+	patches = []
+	space = 2
+	x = np.arange(0, space * len(labels), space)
+	bin_width = .2
+	total_width = bin_width * len(categories)
+
+	plt.clf()
+	plt.subplot(111)
+	for i, category in enumerate(categories):
+		patches.append(mpatches.Patch(color=colors[i], label=category))
+		cur_df = df.loc[df[split] == category]
+		d = cur_df.to_dict('list')
+
+		y = []
+		for label in labels:
+			cc_df = cur_df.loc[cur_df[xlabel] == label]
+			if len(cc_df) != 1:
+				print 'More than 1 value'
+				return
+			d = cc_df.to_dict('list')
+			y.append(d[ylabel][0])
+		plt.bar(x + (bin_width * i), y, color=colors[i], width=bin_width)
+
+	legend = plt.legend(loc='best', fontsize=8, handles=patches, title=split)
+	legend.get_title().set_fontsize('8')
+	plt.xticks(x + ((bin_width / 2) * (len(categories) - 1)), labels)
+	plt.xlabel(xlabel)
 	plt.ylabel(ylabel)
 	plt.title(title)
 	plt.ion()

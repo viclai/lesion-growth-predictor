@@ -180,8 +180,9 @@ def main():
 										p_data.plot(f_str, dts[data_type])
 
 										while True:
-											again = raw_input('Display ' + name + 
-												' for another type of data? [Y/n] ')
+											again = raw_input('Display ' + 
+												name + ' for another type of '
+												'data? [Y/n] ')
 											if again == controls['Skip'] or \
 												again == 'n':
 												again = False
@@ -198,7 +199,8 @@ def main():
 												again = True
 												break
 											else:
-												print 'Invalid response. Try again.'
+												print ('Invalid response. '
+													  'Try again.')
 								except ValueError:
 									print ('Invalid value. Enter the value '
 										   'corresponding to the data type.')
