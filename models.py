@@ -562,6 +562,9 @@ def run_SGD(X, y, **kwargs):
 			results['Test R^2 Score'].append(test_perf)
 
 		
+		record_results(results, attributes, **{
+			'title': 'incremental results'
+			})
 			
 		plot_incremental_performance(
 			incremental_sizes,
@@ -579,9 +582,7 @@ def run_SGD(X, y, **kwargs):
 			'title': 'final results'
 			})
 
-		record_results(results, attributes, **{
-			'title': 'incremental results'
-			})
+
 			
 		# Print summary
 		print '================'
@@ -620,6 +621,7 @@ def run_SGD(X, y, **kwargs):
 				str(final_result['Test R^2 Score'][0]))
 		print
 
+		
 		# Observe performance of model with more than 1 epoch.
 		
 	resp = raw_input('See performance with more than one epoch?\n'
