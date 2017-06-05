@@ -298,7 +298,7 @@ def run_SGD(X, y, **kwargs):
 				for a in exponent_range:
 					train_perf = []
 					val_perf = []
-					print "Testing inv scaling exponent: " + str(a)
+					#print "Testing inv scaling exponent: " + str(a)
 					# Use cross validation to tune parameter
 					kf = KFold()
 					for train, val in kf.split(train_data):
@@ -784,7 +784,7 @@ def run_SGD(X, y, **kwargs):
 		
 		if 'Epochs' not in attributes:
 			attributes.append('Epochs')
-		print  "Final result length" + str(len(final_result)) + " and length of attributes " + str(len(attributes))
+		
 		record_results(final_result, attributes, **{
 			'title': 'final results'
 			})
