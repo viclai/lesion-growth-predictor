@@ -498,8 +498,13 @@ def run_SGD(X, y, **kwargs):
 		# Observe how the model performs with increasingly more data
 		current_total_data = 0
 		incremental_sizes = []
+		prev = -1
 		for i in xrange(0, total_training_instances, batch_size):
 			#print i
+			if int(((i*100.0)/total_training_instances)) % 10 == 0 and int(((i*100.0)/total_training_instances)) != prev: 
+			#display a note every 10% so user knows program didn't freeze
+				prev = int(((i*100.0)/total_training_instances))
+				print str(prev) + "% complete"
 			data = train_data[i:i + batch_size]
 			out = outcomes[i:i + batch_size]
 			model = model.partial_fit(data, out.A1)
@@ -556,9 +561,7 @@ def run_SGD(X, y, **kwargs):
 				)
 			results['Test R^2 Score'].append(test_perf)
 
-		record_results(results, attributes, **{
-			'title': 'incremental results'
-			})
+		
 			
 		plot_incremental_performance(
 			incremental_sizes,
@@ -576,6 +579,10 @@ def run_SGD(X, y, **kwargs):
 			'title': 'final results'
 			})
 
+		record_results(results, attributes, **{
+			'title': 'incremental results'
+			})
+			
 		# Print summary
 		print '================'
 		print 'SUMMARY'
@@ -785,9 +792,7 @@ def run_SGD(X, y, **kwargs):
 		if 'Epochs' not in attributes:
 			attributes.append('Epochs')
 		
-		record_results(final_result, attributes, **{
-			'title': 'final results'
-			})
+		
 		# Print summary
 		print '================'
 		print 'SUMMARY'
@@ -823,6 +828,10 @@ def run_SGD(X, y, **kwargs):
 				str(final_result['Test RMSE'][0]))
 		print ('Final Test R^2 Score             : ' +
 				str(final_result['Test R^2 Score'][0]))
+		
+		record_results(final_result, attributes, **{
+			'title': 'final results'
+			})
 
 	"""
 	We do not have any validation data so use cross validation on the training
