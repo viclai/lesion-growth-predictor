@@ -97,6 +97,8 @@ def main():
 		if home == True:
 			continue
 
+		print 'Loading data...',
+		sys.stdout.flush()
 		p_data.load(
 			perfusion_params[param_val],
 			patch_rad,
@@ -107,6 +109,7 @@ def main():
 			patch_rad,
 			PerfusionDataSet.DataType.TEST,
 			)
+		print 'Done'
 
 		if home == True:
 			continue

@@ -184,6 +184,12 @@ class PerfusionDataSet(DataSet):
 		if X is None or y is None:
 			raise NoDataError()
 
+		type_str = {
+			0 : 'Training',
+			1 : 'Validation',
+			2 : 'Test'
+		}[dt.value]
+
 		if type == 'ctc':
 			# Plot tissue curve with AIF curve
 			self.concentration_time_curve(X, **kwargs)
@@ -196,7 +202,9 @@ class PerfusionDataSet(DataSet):
 			kwargs['x-label'] = 'Concentration Level'
 			two_dimensional_slices(X, y, **kwargs)
 		elif type == 'label_distribution':
-			kwargs['parameter_name'] = self.perfusion_param
+			kwargs['label_name'] = self.perfusion_param
+			kwargs['title'] = ('Frequency Distribution of ' +
+				self.perfusion_param + ' (' + type_str + ')')
 			label_distribution(y, self.uniform_bins[self.perfusion_param],
 				**kwargs)
 		elif type == 'scatter_matrix':
@@ -213,7 +221,7 @@ class PerfusionDataSet(DataSet):
 				xrange(0, time_interval * X.shape[1], time_interval)
 			]
 			filename = ('stats-' + self.perfusion_param + '_' + 
-						str(self.patch_radius) + '_' + str(dt) + '.csv')
+						str(self.patch_radius) + '_' + type_str + '.csv')
 			statistics(X, y, filename=filename, **kwargs)
 		else:
 			print 'No such plot exists\n'

@@ -6,7 +6,6 @@ import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 import pandas as pd
 import os
-import math
 import sys
 
 # Functions to visualize data, plot graphs, and evaluate models go here.
@@ -95,27 +94,34 @@ def label_distribution(y, binsize=1, **kwargs):
 
 	if 'color' not in kwargs:
 		kwargs['color'] = 'b'
-	
-	freqs = defaultdict(int)
-	for val in y.A1:
-		slot = int(math.ceil(val))
-		if slot % binsize != 0:
-			slot = (slot / binsize) + binsize
-		freqs[slot] += 1
-	perf_values = freqs.keys()
-	frequencies = freqs.values()
 
-	if 'parameter_name' not in kwargs:
+	if 'label_name' not in kwargs:
 		label_name = 'Label Value'
 	else:
-		label_name = kwargs.pop('parameter_name') + ' Value'
+		label_name = kwargs.pop('label_name') + ' Value'
 
-	plt.bar(perf_values, frequencies, alpha=0.5, **kwargs)
+	if 'title' not in kwargs:
+		title = ''
+	else:
+		title = kwargs.pop('title')
+
+	slots = [((slot / binsize) * binsize) + binsize if slot % binsize != 0
+		else slot for slot in np.ceil(y).A1.astype(int)
+		]
+	freqs = defaultdict(int)
+	for slot in slots:
+		freqs[slot] += 1
+	label_values = freqs.keys()
+	frequencies = freqs.values()
+
+	plt.clf()
+	plt.bar(label_values, frequencies, **kwargs)
 	plt.xlabel(label_name, fontsize=16)
 	plt.ylabel('Frequency', fontsize=16)
-	plt.show()
-	raw_input("Press any key to continue.")
-	plt.close()
+	plt.title(title, fontsize=16)
+	plt.ion()
+	plt.draw()
+	plt.pause(0.001)
 
 def statistics(X, y, filename='stats.csv', **kwargs):
 	"""

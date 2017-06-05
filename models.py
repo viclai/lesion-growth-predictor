@@ -1153,9 +1153,6 @@ def run_PA(X, y, **kwargs):
 				)
 			results['Test R^2 Score'].append(test_perf)
 
-		record_results(results, attributes, **{
-			'title': 'incremental results'
-			})
 		plot_incremental_performance(
 			incremental_sizes,
 			results['Training RMSE'],
@@ -1173,6 +1170,7 @@ def run_PA(X, y, **kwargs):
 			})
 
 		# Print summary
+		print
 		print '================'
 		print 'SUMMARY'
 		print '================'
@@ -1203,6 +1201,10 @@ def run_PA(X, y, **kwargs):
 		print ('Final Test R^2 Score                  : ' +
 				str(final_result['Test R^2 Score'][0]))
 		print
+
+		record_results(results, attributes, **{
+			'title': 'incremental results'
+			})
 
 	##########################################################################
 	# Observe performance of model with more than 1 epoch.
@@ -1373,10 +1375,9 @@ def run_PA(X, y, **kwargs):
 
 		if 'Epochs' not in attributes:
 			attributes.append('Epochs')
-		record_results(final_result, attributes, **{
-			'title': 'final results'
-			})
+
 		# Print summary
+		print
 		print '================'
 		print 'SUMMARY'
 		print '================'
@@ -1406,3 +1407,7 @@ def run_PA(X, y, **kwargs):
 				str(final_result['Test RMSE'][0]))
 		print ('Final Test R^2 Score                  : ' +
 				str(final_result['Test R^2 Score'][0]))
+		print
+		record_results(final_result, attributes, **{
+			'title': 'final results'
+			})
