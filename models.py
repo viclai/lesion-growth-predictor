@@ -62,6 +62,9 @@ def run_SGD(X, y, **kwargs):
 		'Penalty (Regularization)', 
 		'Alpha',
 		'Epsilon',
+		'Learning Rate',
+		'eta0', # The initial learning rate [default 0.01].
+		'Exponent (inv scaling)', # The exponent for inverse scaling learning rate [default 0.25].
 		'Fit Intercept?',
 		'Shuffle?',
 		'Random Seed',
@@ -70,7 +73,7 @@ def run_SGD(X, y, **kwargs):
 		'Average'
 	] ## might add/ change one of these attributes
 	# eta0 , learning_rate (learning rate schedule), power_t (for inv scaling learning rate)
-	best_penalty = 'elasticnet'
+	
 	
 	# Pick values for parameters
 	results = {}
@@ -102,6 +105,24 @@ def run_SGD(X, y, **kwargs):
 	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
 	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
 	
+	best_penalty = 'l2' # Default
+	# 'none', 'l2', 'l1', or 'elasticnet'
+	print 'Choose a penalty (regularization term) to be used.'
+	print '1: none'
+	print '2: l2'
+	print '3: l1'
+	print '4: elasticnet'
+	pick_penalty = raw_input('Enter value (default: 2): ')
+	if pick_penalty == 'q':
+		return
+	if pick_penalty == '1':
+		best_penalty = 'none'
+	elif pick_penalty == '3':
+		best_penalty = 'l1'
+	elif pick_penalty == '4':
+		best_penalty = 'elasticnet'
+	
+		
 	print 'Tuning regularization penalty with alpha term...'
 	while True:
 		comp = raw_input('Compare errors for range of alpha values? [Y/n] ')
@@ -165,13 +186,177 @@ def run_SGD(X, y, **kwargs):
 			return
 		else:
 			break
-
+		
+			
 	best_alpha = 0.0001 # Default
 	alpha_pick = raw_input('Choose value of alpha (default: ' + str(best_alpha) + '): ')
 	if alpha_pick != '':
 		best_alpha = float(alpha_pick)
 
+	best_learn = 'optimal' # Default
+	# 'none', 'l2', 'l1', or 'elasticnet'
+	print 'Choose a learning rate schedule to be used.'
+	print '1: Constant'
+	print '2: Optimal'
+	print '3: Inverse Scaling'
+	pick_learn = raw_input('Enter value (default: 2): ')
+	if pick_learn == 'q':
+		return
+	if pick_learn == '1':
+		best_learn = 'constant'
+	elif pick_learn == '3':
+		best_learn = 'invscaling'
+		
+	print 'Tuning initial learning rate for ' +  best_learn + '...'
+	while True:
+		comp = raw_input('Compare errors for range of initial learning rates (default 0.01)? [Y/n] ')
+		if comp == 'Y':
+			start = raw_input('Enter lower bound (inclusive) of range: ')
+			end = raw_input('Enter upper bound (exclusive) of range: ')
+			incr = raw_input('Enter increment: ')
+			learnRate_range = np.arange(float(start), float(end), float(incr))
 
+			avg_train_perf = []
+			avg_val_perf = []
+
+			for a in learnRate_range:
+				train_perf = []
+				val_perf = []
+				print "Testing initial learn rate " + str(a)
+				# Use cross validation to tune parameter
+				kf = KFold()
+				for train, val in kf.split(train_data):
+					X_train, X_val = train_data[train], train_data[val]
+					y_train, y_val = outcomes[train].A1, outcomes[val].A1
+
+					model = SGDRegressor(
+						penalty=best_penalty,
+						alpha = best_alpha,
+						learning_rate=best_learn,
+						eta0 = a,
+						random_state=np.random.RandomState(seed)
+						)
+
+					for i in xrange(0, len(X_train), batch_size):
+						model = model.partial_fit(
+							X_train[i:i + batch_size],
+							y_train[i:i + batch_size]
+							)
+					y_pred = model.predict(X_train)
+					train_perf.append(regression_performance(
+						y_train,
+						y_pred,
+						'rms'
+						))
+					y_pred = model.predict(X_val)
+					val_perf.append(regression_performance(
+						y_val,
+						y_pred,
+						'rms'
+						))
+				avg_train_perf.append(
+					np.sum(train_perf) * 1.0 / len(train_perf)
+					)
+				avg_val_perf.append(
+					np.sum(val_perf) * 1.0 / len(val_perf)
+					)
+			plot_hyperparameter(
+				learnRate_range,
+				avg_train_perf,
+				avg_val_perf,
+				**{
+					'parameter' : r'Learning Rate type with initial learning rate $eta0$',
+					'score' : 'Root Mean Squared Error'
+				})
+		elif comp == 'q':
+			return
+		else:
+			break
+
+	best_learnRate = 0.01 # Default
+	learnrate_PICK = raw_input('Choose value of initial learn rate for ' +  best_learn + '(default: ' +
+							 str(best_learnRate) + '): ')
+	if learnrate_PICK == 'q':
+		return
+	if learnrate_PICK != '':
+		best_learnRate = float(learnrate_PICK)
+	
+	best_powT = 0.25
+	if best_learn == 'invscaling':
+		print 'Tuning exponent for inverse scaling learning rate...'
+		while True:
+			comp = raw_input('Compare errors for range of exponents for inv scaling? [Y/n] ')
+			if comp == 'Y':
+				start = raw_input('Enter lower bound (inclusive) of range: ')
+				end = raw_input('Enter upper bound (exclusive) of range: ')
+				incr = raw_input('Enter increment: ')
+				exponent_range = np.arange(float(start), float(end), float(incr))
+
+				avg_train_perf = []
+				avg_val_perf = []
+
+				for a in exponent_range:
+					train_perf = []
+					val_perf = []
+					print "Testing inv scaling exponent: " + str(a)
+					# Use cross validation to tune parameter
+					kf = KFold()
+					for train, val in kf.split(train_data):
+						X_train, X_val = train_data[train], train_data[val]
+						y_train, y_val = outcomes[train].A1, outcomes[val].A1
+
+						model = SGDRegressor(
+							penalty=best_penalty,
+							alpha = best_alpha,
+							learning_rate=best_learn,
+							eta0 = best_learnRate,
+							power_t=a,
+							random_state=np.random.RandomState(seed)
+							)
+
+						for i in xrange(0, len(X_train), batch_size):
+							model = model.partial_fit(
+								X_train[i:i + batch_size],
+								y_train[i:i + batch_size]
+								)
+						y_pred = model.predict(X_train)
+						train_perf.append(regression_performance(
+							y_train,
+							y_pred,
+							'rms'
+							))
+						y_pred = model.predict(X_val)
+						val_perf.append(regression_performance(
+							y_val,
+							y_pred,
+							'rms'
+							))
+					avg_train_perf.append(
+						np.sum(train_perf) * 1.0 / len(train_perf)
+						)
+					avg_val_perf.append(
+						np.sum(val_perf) * 1.0 / len(val_perf)
+						)
+				plot_hyperparameter(
+					exponent_range,
+					avg_train_perf,
+					avg_val_perf,
+					**{
+						'parameter' : r'Inv Scaling Learn with exponent $pow_t$',
+						'score' : 'Root Mean Squared Error'
+					})
+			elif comp == 'q':
+				return
+			else:
+				break
+
+		powT_PICK = raw_input('Choose value of exponent for inv scaling learn(default: ' +
+								 str(best_powT) + '): ')
+		if powT_PICK == 'q':
+			return
+		if powT_PICK != '':
+			best_powT = float(powT_PICK)
+			
 	print 'Tuning epsilon (threshold)...'
 	while True:
 		comp = raw_input('Compare errors for range of epsilon values? [Y/n] ')
@@ -186,6 +371,7 @@ def run_SGD(X, y, **kwargs):
 			for e in epsilon_range:
 				train_perf = []
 				val_perf = []
+				#print e
 
 				# Use cross validation to tune parameter
 				kf = KFold()
@@ -304,12 +490,16 @@ def run_SGD(X, y, **kwargs):
 			shuffle=shuffle,
 			random_state=seed,
 			loss=loss,
-			average=sgd_average
+			average=sgd_average,
+			learning_rate=best_learn,
+			eta0 = best_learnRate,
+			power_t=best_powT
 			)
 		# Observe how the model performs with increasingly more data
 		current_total_data = 0
 		incremental_sizes = []
 		for i in xrange(0, total_training_instances, batch_size):
+			#print i
 			data = train_data[i:i + batch_size]
 			out = outcomes[i:i + batch_size]
 			model = model.partial_fit(data, out.A1)
@@ -329,6 +519,9 @@ def run_SGD(X, y, **kwargs):
 			results['Random Seed'].append(seed)
 			results['Loss Function'].append(loss)
 			results['Warm Start?'].append(False)
+			results['Learning Rate'].append(best_learn)
+			results['eta0'].append(best_learnRate)
+			results['Exponent (inv scaling)'].append(best_powT)
 			results['Total Number of Examples Trained'].append(
 				current_total_data
 				)
@@ -395,14 +588,17 @@ def run_SGD(X, y, **kwargs):
 		print 'Model Parameters'
 		print '----------------'
 		print 'Penalty(Regulariz.): ' + best_penalty
-		print 'Alpha             : ' + str(best_alpha)
-		print 'Epsilon           : ' + str(best_epsilon)
-		print 'Fit Intercept     : ' + str(intercept)
-		print 'Shuffle           : ' + str(shuffle)
-		print 'Random Seed       : ' + str(seed)
-		print 'Loss Function     : ' + loss
-		print 'Warm Start        : ' + str(False)
-		print 'Average           : ' + str(sgd_average)
+		print 'Alpha              : ' + str(best_alpha)
+		print 'Epsilon            : ' + str(best_epsilon)
+		print 'Fit Intercept      : ' + str(intercept)
+		print 'Shuffle            : ' + str(shuffle)
+		print 'Random Seed        : ' + str(seed)
+		print 'Loss Function      : ' + loss
+		print 'Warm Start         : ' + str(False)
+		print 'Average            : ' + str(sgd_average)
+		print 'Learning Rate Sched: ' + str(best_learn)
+		print 'Initial Learn Rate : ' + str(best_learnRate)
+		print 'Exponent (inv scale):' + str(best_powT)
 		print '----------------'
 		print 'Results'
 		print '----------------'
@@ -429,20 +625,23 @@ def run_SGD(X, y, **kwargs):
 		for a in attributes:
 			final_result[a] = []
 		
-		results['Perfusion Parameter'].append(perfusion_param)
-		results['Model'].append('SGD')
-		results['Patch Radius'].append(patch_radius)
-		results['Batch Size'].append(batch_size)
-		results['Penalty (Regularization)'].append(best_penalty)
-		results['Alpha'].append(best_alpha)
-		results['Average'].append(sgd_average)
-		results['Epsilon'].append(best_epsilon)
-		results['Fit Intercept?'].append(intercept)
-		results['Shuffle?'].append(shuffle)
-		results['Random Seed'].append(seed)
-		results['Loss Function'].append(loss)
-		results['Warm Start?'].append(False)
-		results['Total Number of Examples Trained'].append(
+		final_result['Perfusion Parameter'].append(perfusion_param)
+		final_result['Model'].append('SGD')
+		final_result['Patch Radius'].append(patch_radius)
+		final_result['Batch Size'].append(batch_size)
+		final_result['Penalty (Regularization)'].append(best_penalty)
+		final_result['Alpha'].append(best_alpha)
+		final_result['Average'].append(sgd_average)
+		final_result['Epsilon'].append(best_epsilon)
+		final_result['Fit Intercept?'].append(intercept)
+		final_result['Shuffle?'].append(shuffle)
+		final_result['Random Seed'].append(seed)
+		final_result['Loss Function'].append(loss)
+		final_result['Warm Start?'].append(False)
+		final_result['Learning Rate'].append(best_learn)
+		final_result['eta0'].append(best_learnRate)
+		final_result['Exponent (inv scaling)'].append(best_powT)
+		final_result['Total Number of Examples Trained'].append(
 			total_training_instances
 		)
 				
@@ -461,7 +660,7 @@ def run_SGD(X, y, **kwargs):
 				for n in n_range:
 					train_perf = []
 					val_perf = []
-
+				
 					if shuffle:
 						np.random.shuffle(indices)
 						train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
@@ -538,6 +737,9 @@ def run_SGD(X, y, **kwargs):
 			shuffle=shuffle,
 			random_state=seed,
 			loss=loss,
+			learning_rate=best_learn,
+			eta0=best_learnRate,
+			power_t=best_powT
 			)
 		for rnd in xrange(best_n_iter):
 			if shuffle:
@@ -556,7 +758,7 @@ def run_SGD(X, y, **kwargs):
 			y_pred,
 			'rms'
 			)
-		final_result['Training MSE'].append(overall_train_perf)
+		final_result['Training RMSE'].append(overall_train_perf)
 		overall_train_perf = regression_performance(
 			y[0].A1,
 			y_pred,
@@ -571,7 +773,7 @@ def run_SGD(X, y, **kwargs):
 			y_pred,
 			'rms'
 			)
-		final_result['Test MSE'].append(test_perf)
+		final_result['Test RMSE'].append(test_perf)
 		test_perf = regression_performance(
 			y[2].A1,
 			y_pred,
@@ -582,7 +784,7 @@ def run_SGD(X, y, **kwargs):
 		
 		if 'Epochs' not in attributes:
 			attributes.append('Epochs')
-
+		print  "Final result length" + str(len(final_result)) + " and length of attributes " + str(len(attributes))
 		record_results(final_result, attributes, **{
 			'title': 'final results'
 			})
@@ -598,24 +800,27 @@ def run_SGD(X, y, **kwargs):
 		print 'Model Parameters'
 		print '----------------'
 		print 'Penalty(Regulariz.): ' + best_penalty
-		print 'Alpha             : ' + str(best_alpha)
-		print 'Epsilon           : ' + str(best_epsilon)
-		print 'Fit Intercept     : ' + str(intercept)
-		print 'Shuffle           : ' + str(shuffle)
-		print 'Random Seed       : ' + str(seed)
-		print 'Loss Function     : ' + loss
-		print 'Warm Start        : ' + str(False)
-		print 'Average           : ' + str(sgd_average)
+		print 'Alpha              : ' + str(best_alpha)
+		print 'Epsilon            : ' + str(best_epsilon)
+		print 'Fit Intercept      : ' + str(intercept)
+		print 'Shuffle            : ' + str(shuffle)
+		print 'Random Seed        : ' + str(seed)
+		print 'Loss Function      : ' + loss
+		print 'Warm Start         : ' + str(False)
+		print 'Average            : ' + str(sgd_average)
+		print 'Learning Rate Sched: ' + str(best_learn)
+		print 'Initial Learn Rate : ' + str(best_learnRate)
+		print 'Exponent (inv scale):' + str(best_powT)
 		print '----------------'
 		print 'Results'
 		print '----------------'
 		print 'Number of Epochs                 : ' + str(best_n_iter)
-		print ('Final Training Mean Squared Error: ' +
-				str(final_result['Training MSE'][0]))
+		print ('Final Training Root Mean Squared Error: ' +
+				str(final_result['Training RMSE'][0]))
 		print ('Final Training R^2 Score         : ' +
 				str(final_result['Training R^2 Score'][0]))
 		print ('Final Test Mean Squared Error    : ' +
-				str(final_result['Test MSE'][0]))
+				str(final_result['Test RMSE'][0]))
 		print ('Final Test R^2 Score             : ' +
 				str(final_result['Test R^2 Score'][0]))
 
