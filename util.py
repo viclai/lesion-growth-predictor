@@ -228,7 +228,7 @@ def plot_hyperparameter(h, train_sc, test_sc, **kwargs):
 	plt.draw()
 	plt.pause(0.001)
 
-def plot_incremental_performance(size, train_sc, test_sc, **kwargs):
+def learning_curve(size, train_sc, test_sc, **kwargs):
 	"""
 	Plots a scatterplot of the training score and test score versus the size
 	of the data trained on. This is helpful for observing the performance of
@@ -363,7 +363,7 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 	Google 'matplotlib markers' and 'matplotlib colors'.
 	"""
 	markers = ['x', 'o']
-	colors = ['b', 'r']
+	colors = ['b', 'r', 'g']
 
 	if 'title' not in kwargs:
 		title = ''
@@ -432,9 +432,9 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 		handles=lines,
 		bbox_to_anchor=(1, 0.75)
 		)
-	plt.xlabel(attr[0])
-	plt.ylabel(ylabel)
-	plt.title(title)
+	plt.xlabel(attr[0], **kwargs)
+	plt.ylabel(ylabel, **kwargs)
+	plt.title(title, **kwargs)
 	plt.ion()
 	plt.draw()
 	plt.pause(0.001)
@@ -493,9 +493,9 @@ def histogram_from_csv(filepath, split, xlabel, ylabel, **kwargs):
 	legend = plt.legend(loc='best', fontsize=8, handles=patches, title=split)
 	legend.get_title().set_fontsize('8')
 	plt.xticks(x + ((bin_width / 2) * (len(categories) - 1)), labels)
-	plt.xlabel(xlabel)
-	plt.ylabel(ylabel)
-	plt.title(title)
+	plt.xlabel(xlabel, **kwargs)
+	plt.ylabel(ylabel, **kwargs)
+	plt.title(title, **kwargs)
 	plt.ion()
 	plt.draw()
 	plt.pause(0.001)

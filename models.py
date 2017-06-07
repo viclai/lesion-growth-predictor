@@ -1,6 +1,6 @@
 from sklearn.linear_model import SGDRegressor, PassiveAggressiveRegressor
 from util import regression_performance, plot_hyperparameter, \
-				 plot_incremental_performance, record_results
+				 learning_curve, record_results
 from sklearn.model_selection import KFold
 import numpy as np
 import pandas as pd
@@ -566,7 +566,7 @@ def run_SGD(X, y, **kwargs):
 			'title': 'incremental results'
 			})
 			
-		plot_incremental_performance(
+		learning_curve(
 			incremental_sizes,
 			results['Training RMSE'],
 			results['Test RMSE'],
@@ -1164,7 +1164,7 @@ def run_PA(X, y, **kwargs):
 				)
 			results['Test R^2 Score'].append(test_perf)
 
-		plot_incremental_performance(
+		learning_curve(
 			incremental_sizes,
 			results['Training RMSE'],
 			results['Test RMSE'],
