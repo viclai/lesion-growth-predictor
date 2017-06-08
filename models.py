@@ -2,6 +2,7 @@ from sklearn.linear_model import SGDRegressor, PassiveAggressiveRegressor
 from util import regression_performance, plot_hyperparameter, \
 				 learning_curve, record_results
 from sklearn.model_selection import KFold
+from controls import print_controls, ctrls
 import numpy as np
 import pandas as pd
 import os
@@ -38,6 +39,7 @@ def run_SGD(X, y, **kwargs):
 	print 'Examining Stochastic Gradient Descent for Linear Regression...'
 	
 	total_training_instances = len(X[0])
+	controls = ctrls()
 
 	if 'parameter' not in kwargs:
 		perfusion_param = None
@@ -83,7 +85,7 @@ def run_SGD(X, y, **kwargs):
 	batch_size = 100 # Default
 	size = raw_input('Enter batch size (default: ' +
 					str(batch_size) + '): ')
-	if size == 'q':
+	if size == controls['Quit']:
 		return
 	if size != '':
 		batch_size = int(size)
@@ -93,7 +95,7 @@ def run_SGD(X, y, **kwargs):
 	seed = None # Default
 	pick_seed = raw_input('Enter seed of random number generator to '
 						  'shuffle: ')
-	if pick_seed == 'q':
+	if pick_seed == controls['Quit']:
 		return
 	if pick_seed != '':
 		seed = int(pick_seed)
@@ -113,7 +115,7 @@ def run_SGD(X, y, **kwargs):
 	print '3: l1'
 	print '4: elasticnet'
 	pick_penalty = raw_input('Enter value (default: 2): ')
-	if pick_penalty == 'q':
+	if pick_penalty == controls['Quit']:
 		return
 	if pick_penalty == '1':
 		best_penalty = 'none'
@@ -182,7 +184,7 @@ def run_SGD(X, y, **kwargs):
 					'parameter' : r'Regularization l2 with multiplier $alpha$',
 					'score' : 'Root Mean Squared Error'
 				})
-		elif comp == 'q':
+		elif comp == controls['Quit']:
 			return
 		else:
 			break
@@ -200,7 +202,7 @@ def run_SGD(X, y, **kwargs):
 	print '2: Optimal'
 	print '3: Inverse Scaling'
 	pick_learn = raw_input('Enter value (default: 2): ')
-	if pick_learn == 'q':
+	if pick_learn == controls['Quit']:
 		return
 	if pick_learn == '1':
 		best_learn = 'constant'
@@ -268,7 +270,7 @@ def run_SGD(X, y, **kwargs):
 					'parameter' : r'Learning Rate type with initial learning rate $eta0$',
 					'score' : 'Root Mean Squared Error'
 				})
-		elif comp == 'q':
+		elif comp == controls['Quit']:
 			return
 		else:
 			break
@@ -276,7 +278,7 @@ def run_SGD(X, y, **kwargs):
 	best_learnRate = 0.01 # Default
 	learnrate_PICK = raw_input('Choose value of initial learn rate for ' +  best_learn + '(default: ' +
 							 str(best_learnRate) + '): ')
-	if learnrate_PICK == 'q':
+	if learnrate_PICK == controls['Quit']:
 		return
 	if learnrate_PICK != '':
 		best_learnRate = float(learnrate_PICK)
@@ -345,14 +347,14 @@ def run_SGD(X, y, **kwargs):
 						'parameter' : r'Inv Scaling Learn with exponent $pow_t$',
 						'score' : 'Root Mean Squared Error'
 					})
-			elif comp == 'q':
+			elif comp == controls['Quit']:
 				return
 			else:
 				break
 
 		powT_PICK = raw_input('Choose value of exponent for inv scaling learn(default: ' +
 								 str(best_powT) + '): ')
-		if powT_PICK == 'q':
+		if powT_PICK == controls['Quit']:
 			return
 		if powT_PICK != '':
 			best_powT = float(powT_PICK)
@@ -415,7 +417,7 @@ def run_SGD(X, y, **kwargs):
 					'parameter' : r'Epsilon $\epsilon$',
 					'score' : 'Root Mean Squared Error'
 				})
-		elif comp == 'q':
+		elif comp == controls['Quit']:
 			return
 		else:
 			break
@@ -423,7 +425,7 @@ def run_SGD(X, y, **kwargs):
 	best_epsilon = 0.1 # Default
 	epsilon_pick = raw_input('Choose value of epsilon (default: ' +
 							 str(best_epsilon) + '): ')
-	if epsilon_pick == 'q':
+	if epsilon_pick == controls['Quit']:
 		return
 	if epsilon_pick != '':
 		best_epsilon = float(epsilon_pick)
@@ -432,7 +434,7 @@ def run_SGD(X, y, **kwargs):
 	# shuffle
 	shuffle = True # Default
 	shuffle_pick = raw_input('Shuffle after each epoch (default: Y)? [Y/n] ')
-	if shuffle_pick == 'q':
+	if shuffle_pick == controls['Quit']:
 		return
 	if shuffle_pick == 'n':
 		shuffle = False
@@ -441,7 +443,7 @@ def run_SGD(X, y, **kwargs):
 	# fit_intercept
 	intercept = True # Default
 	pick_intercept = raw_input('Fit intercept (default: Y)? [Y/n] ')
-	if pick_intercept == 'q':
+	if pick_intercept == controls['Quit']:
 		return
 	if pick_intercept == 'n':
 		intercept = False
@@ -449,7 +451,7 @@ def run_SGD(X, y, **kwargs):
 	# average
 	sgd_average = False # Default
 	avg_pick = raw_input('Take average of SGD weights (default: N)? [Y/n] ')
-	if avg_pick == 'q':
+	if avg_pick == controls['Quit']:
 		return
 	if avg_pick == 'Y':
 		sgd_average = True
@@ -462,7 +464,7 @@ def run_SGD(X, y, **kwargs):
 	print '3: Epsilon Insensitive'
 	print '4: Squared Epsilon Insensitive'
 	pick_loss = raw_input('Enter value (default: 1): ')
-	if pick_loss == 'q':
+	if pick_loss == controls['Quit']:
 		return
 	elif pick_loss == '2':
 		loss = 'huber'
@@ -476,7 +478,7 @@ def run_SGD(X, y, **kwargs):
 	# Observe performance of model for each batch that has been trained on.
 	##########################################################################
 	resp = raw_input('See incremental performance? [Y/n] ')
-	if resp == 'q':
+	if resp == controls['Quit']:
 		return
 	if resp == 'Y':
 		# Create model with tuned parameters
@@ -626,7 +628,7 @@ def run_SGD(X, y, **kwargs):
 		
 	resp = raw_input('See performance with more than one epoch?\n'
 					 'Parameters will remain the same. [Y/n] ')
-	if resp == 'q':
+	if resp == controls['Quit']:
 		return
 	if resp == 'Y':
 		print 'Tuning number of epochs...'
@@ -720,7 +722,7 @@ def run_SGD(X, y, **kwargs):
 						'parameter' : r'Epochs',
 						'score' : 'Root Mean Squared Error'
 					})
-			elif comp == 'q':
+			elif comp == controls['Quit']:
 				return
 			else:
 				break
@@ -728,7 +730,7 @@ def run_SGD(X, y, **kwargs):
 		best_n_iter = 5 # Default
 		n_iter = raw_input('Enter the number of epochs (default: ' +
 							str(best_n_iter) + '): ')
-		if n_iter == 'q':
+		if n_iter == controls['Quit']:
 			return
 		if n_iter != '':
 			best_n_iter = int(n_iter)
@@ -834,16 +836,218 @@ def run_SGD(X, y, **kwargs):
 		record_results(final_result, attributes, **{
 			'title': 'final results'
 			})
-
-	"""
-	We do not have any validation data so use cross validation on the training
-	set to tune your hyperparameters.
-	"""
 	print 'Done'
+
+def run_multiple_PA(X, y, **kwargs):
+	"""
+	Runs the Passive-Aggressive algorithm multiple times, using different
+	seeds, on the regression data.
+
+	Parameters
+	--------------------
+		X -- tuple of length 3, 
+			1. numpy matrix of shape (n_1,d), features for training
+			2. numpy matrix of shape (n_2,d), features for validation
+			3. numpy matrix of shape (n_3,d), features for test
+		y -- tuple of length 3,
+			1. numpy matrix of shape (n_1,1), targets for training
+			2. numpy matrix of shape (n_2,1), targets for validation
+			3. numpy matrix of shape (n_3,1), targets for test
+	"""
+
+	if 'parameter' not in kwargs:
+		perfusion_param = None
+	else:
+		perfusion_param = kwargs.pop('parameter')
+
+	if 'patch_radius' not in kwargs:
+		patch_radius = None
+	else:
+		patch_radius = kwargs.pop('patch_radius')
+
+	seeds = raw_input('Enter seeds (separated by space): ')
+	seeds = [int(s) for s in seeds.split()]
+
+	total_training_instances = len(X[0])
+	batch_size = 100
+
+	# Shuffle data
+	indices = np.arange(0, total_training_instances)
+	np.random.seed(seeds[0])
+	np.random.shuffle(indices)
+	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
+	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
+
+	print 'Enter range of C.'
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	C_range = np.arange(float(start), float(end), float(incr))
+	min_test_err = None
+	best_C = None
+	for c in C_range:
+		avg_test_errs = np.array([])
+		for seed in seeds[1:]:
+			model = PassiveAggressiveRegressor(
+				C=c,
+				random_state=np.random.RandomState(seed)
+				)
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i + batch_size]
+				out = outcomes[i:i + batch_size]
+				model = model.partial_fit(data, out.A1)
+
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs, [
+				regression_performance(y[2].A1, y_pred, 'rms')
+				])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_C = c
+
+	print 'Enter range of epsilon.'
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	epsilon_range = np.arange(float(start), float(end), float(incr))
+	min_test_err = None
+	best_epsilon = None
+	for e in epsilon_range:
+		avg_test_errs = np.array([])
+		for seed in seeds[1:]:
+			model = PassiveAggressiveRegressor(
+				epsilon=e,
+				random_state=np.random.RandomState(seed)
+				)
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i + batch_size]
+				out = outcomes[i:i + batch_size]
+				model = model.partial_fit(data, out.A1)
+
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs, [
+				regression_performance(y[2].A1, y_pred, 'rms')
+				])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_epsilon = e
+
+	print 'Enter range of epochs.'
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	epoch_range = np.arange(int(start), int(end), int(incr))
+	min_test_err = None
+	best_epochs = None
+	for e in epoch_range:
+		avg_test_errs = np.array([])
+		for seed in seeds[1:]:
+			model = PassiveAggressiveRegressor(
+				random_state=np.random.RandomState(seed)
+				)
+			for rnd in xrange(e):
+				for i in xrange(0, total_training_instances, batch_size):
+					data = train_data[i:i + batch_size]
+					out = outcomes[i:i + batch_size]
+					model = model.partial_fit(data, out.A1)
+
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs, [
+				regression_performance(y[2].A1, y_pred, 'rms')
+				])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_epochs = e
+
+	attributes = [
+		'Perfusion Parameter',
+		'Model',
+		'Patch Radius',
+		'Batch Size',
+		'Total Number of Examples Trained',
+		'Trial',
+		'Training RMSE',
+		'Test RMSE',
+		'Training R^2 Score',
+		'Test R^2 Score',
+		'C (Regularization)', # Aggressiveness
+		'Epsilon',
+		'Epochs',
+		'Fit Intercept?',
+		'Shuffle?',
+		'Loss Function',
+		'Warm Start?'
+	]
+	results = {}
+	for a in attributes:
+		results[a] = []
+	trials = raw_input('Enter number of trials: ')
+	trials = int(trials)
+
+	indices = np.arange(0, total_training_instances)
+	np.random.shuffle(indices)
+	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
+	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
+
+	np.random.seed(None)
+	for trial in xrange(trials):
+		model = PassiveAggressiveRegressor(
+			C=best_C,
+			epsilon=best_epsilon,
+			fit_intercept=True,
+			n_iter=1, # Not applicable for partial fit
+			shuffle=True,
+			random_state=None,
+			loss='epsilon_insensitive',
+			warm_start=False
+			)
+		for rnd in xrange(best_epochs):
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i + batch_size]
+				out = outcomes[i:i + batch_size]
+				model = model.partial_fit(data, out.A1)
+
+		results['Perfusion Parameter'].append(perfusion_param)
+		results['Model'].append('PA')
+		results['Patch Radius'].append(patch_radius)
+		results['Batch Size'].append(batch_size)
+		results['C (Regularization)'].append(best_C)
+		results['Epsilon'].append(best_epsilon)
+		results['Fit Intercept?'].append(True)
+		results['Shuffle?'].append(True)
+		results['Epochs'].append(best_epochs)
+		results['Trial'].append(trial + 1)
+		results['Loss Function'].append('epsilon_insensitive')
+		results['Warm Start?'].append(False)
+		results['Total Number of Examples Trained'].append(
+			total_training_instances
+			)
+
+		y_pred = model.predict(X[0])
+		results['Training RMSE'].append(
+			regression_performance(y[0].A1, y_pred, 'rms')
+			)
+		results['Training R^2 Score'].append(
+			regression_performance(y[0].A1, y_pred, 'r2-score')
+			)
+
+		y_pred = model.predict(X[2])
+		results['Test RMSE'].append(
+			regression_performance(y[2].A1, y_pred, 'rms')
+			)
+		results['Test R^2 Score'].append(
+			regression_performance(y[2].A1, y_pred, 'r2-score')
+			)
+	record_results(results, attributes, **{
+		'title': 'trial results'
+		})
 
 def run_PA(X, y, **kwargs):
 	"""
-	Runs the Passive-Aggressive algorithm on the regression data.
+	Runs the Passive-Aggressive algorithm manually on the regression data.
 
 	Parameters
 	--------------------
@@ -860,6 +1064,7 @@ def run_PA(X, y, **kwargs):
 	print 'Examining Passive-Aggressive for Regression...'
 
 	total_training_instances = len(X[0])
+	controls = ctrls()
 
 	if 'parameter' not in kwargs:
 		perfusion_param = None
@@ -898,18 +1103,17 @@ def run_PA(X, y, **kwargs):
 	##########################################################################
 
 	batch_size = 100 # Default
-	size = raw_input('Enter batch size (default: ' +
-					str(batch_size) + '): ')
-	if size == 'q':
+	size = raw_input('Enter batch size (default: ' + str(batch_size) + '): ')
+	if size == controls['Quit']:
 		return
 	if size != '':
 		batch_size = int(size)
 
-	# Enter a seed in order to reproduce results (even if the shuffle option
-	# is not set to True)
+	# Enter a seed in order to reproduce results (even if the shuffle option is
+	# not set to True)
 	seed = None # Default
 	pick_seed = raw_input('Enter seed for random number generator: ')
-	if pick_seed == 'q':
+	if pick_seed == controls['Quit']:
 		return
 	if pick_seed != '':
 		seed = int(pick_seed)
@@ -925,17 +1129,17 @@ def run_PA(X, y, **kwargs):
 	while True:
 		comp = raw_input('Compare errors for range of C values? [Y/n] ')
 		if comp == 'Y':
-			start = raw_input('Enter lower bound (inclusive) of range: ')
-			end = raw_input('Enter upper bound (exclusive) of range: ')
-			incr = raw_input('Enter increment: ')
+			start = raw_input('\tEnter lower bound (inclusive) of range: ')
+			end = raw_input('\tEnter upper bound (exclusive) of range: ')
+			incr = raw_input('\tEnter increment: ')
 			C_range = np.arange(float(start), float(end), float(incr))
 
 			avg_train_perf = []
 			avg_val_perf = []
 
 			for c in C_range:
-				train_perf = []
-				val_perf = []
+				train_perf = np.array([])
+				val_perf = np.array([])
 
 				# Use cross validation to tune parameter
 				kf = KFold()
@@ -954,23 +1158,21 @@ def run_PA(X, y, **kwargs):
 							y_train[i:i + batch_size]
 							)
 					y_pred = model.predict(X_train)
-					train_perf.append(regression_performance(
+					train_perf = np.append(train_perf, [
+						regression_performance(
 						y_train,
 						y_pred,
 						'rms'
-						))
+						)])
 					y_pred = model.predict(X_val)
-					val_perf.append(regression_performance(
+					val_perf = np.append(val_perf, [
+						regression_performance(
 						y_val,
 						y_pred,
 						'rms'
-						))
-				avg_train_perf.append(
-					np.sum(train_perf) * 1.0 / len(train_perf)
-					)
-				avg_val_perf.append(
-					np.sum(val_perf) * 1.0 / len(val_perf)
-					)
+						)])
+				avg_train_perf.append(train_perf.mean())
+				avg_val_perf.append(val_perf.mean())
 			plot_hyperparameter(
 				C_range,
 				avg_train_perf,
@@ -979,7 +1181,7 @@ def run_PA(X, y, **kwargs):
 					'parameter' : r'Regularization $C$',
 					'score' : 'Root Mean Squared Error'
 				})
-		elif comp == 'q':
+		elif comp == controls['Quit']:
 			return
 		else:
 			break
@@ -994,16 +1196,16 @@ def run_PA(X, y, **kwargs):
 	while True:
 		comp = raw_input('Compare errors for range of epsilon values? [Y/n] ')
 		if comp == 'Y':
-			start = raw_input('Enter lower bound (inclusive) of range: ')
-			end = raw_input('Enter upper bound (exclusive) of range: ')
-			incr = raw_input('Enter increment: ')
+			start = raw_input('\tEnter lower bound (inclusive) of range: ')
+			end = raw_input('\tEnter upper bound (exclusive) of range: ')
+			incr = raw_input('\tEnter increment: ')
 			epsilon_range = np.arange(float(start), float(end), float(incr))
 			avg_train_perf = []
 			avg_val_perf = []
 
 			for e in epsilon_range:
-				train_perf = []
-				val_perf = []
+				train_perf = np.array([])
+				val_perf = np.array([])
 
 				# Use cross validation to tune parameter
 				kf = KFold()
@@ -1022,23 +1224,21 @@ def run_PA(X, y, **kwargs):
 							y_train[i:i + batch_size]
 							)
 					y_pred = model.predict(X_train)
-					train_perf.append(regression_performance(
+					train_perf = np.append(train_perf, [
+						regression_performance(
 						y_train,
 						y_pred,
 						'rms'
-						))
+						)])
 					y_pred = model.predict(X_val)
-					val_perf.append(regression_performance(
+					val_perf = np.append(val_perf, [
+						regression_performance(
 						y_val,
 						y_pred,
 						'rms'
-						))
-				avg_train_perf.append(
-					np.sum(train_perf) * 1.0 / len(train_perf)
-					)
-				avg_val_perf.append(
-					np.sum(val_perf) * 1.0 / len(val_perf)
-					)
+						)])
+				avg_train_perf.append(train_perf.mean())
+				avg_val_perf.append(val_perf.mean())
 			plot_hyperparameter(
 				epsilon_range,
 				avg_train_perf,
@@ -1047,7 +1247,7 @@ def run_PA(X, y, **kwargs):
 					'parameter' : r'Epsilon $\epsilon$',
 					'score' : 'Root Mean Squared Error'
 				})
-		elif comp == 'q':
+		elif comp == controls['Quit']:
 			return
 		else:
 			break
@@ -1055,7 +1255,7 @@ def run_PA(X, y, **kwargs):
 	best_epsilon = 0.1 # Default
 	epsilon_pick = raw_input('Choose value of epsilon (default: ' +
 							 str(best_epsilon) + '): ')
-	if epsilon_pick == 'q':
+	if epsilon_pick == controls['Quit']:
 		return
 	if epsilon_pick != '':
 		best_epsilon = float(epsilon_pick)
@@ -1064,7 +1264,7 @@ def run_PA(X, y, **kwargs):
 	# shuffle
 	shuffle = True # Default
 	shuffle_pick = raw_input('Shuffle after each epoch (default: Y)? [Y/n] ')
-	if shuffle_pick == 'q':
+	if shuffle_pick == controls['Quit']:
 		return
 	if shuffle_pick == 'n':
 		shuffle = False
@@ -1073,7 +1273,7 @@ def run_PA(X, y, **kwargs):
 	# fit_intercept
 	intercept = True # Default
 	pick_intercept = raw_input('Fit intercept (default: Y)? [Y/n] ')
-	if pick_intercept == 'q':
+	if pick_intercept == controls['Quit']:
 		return
 	if pick_intercept == 'n':
 		intercept = False
@@ -1085,7 +1285,7 @@ def run_PA(X, y, **kwargs):
 	print '1: Epsilon Insensitive (PA-I)'
 	print '2: Squared Epsilon Insensitive (PA-II)'
 	pick_loss = raw_input('Enter value (default: 1): ')
-	if pick_loss == 'q':
+	if pick_loss == controls['Quit']:
 		return
 	if pick_loss == '2':
 		loss = 'squared_epsilon_insensitive'
@@ -1095,7 +1295,7 @@ def run_PA(X, y, **kwargs):
 	# Observe performance of model for each batch that has been trained on.
 	##########################################################################
 	resp = raw_input('See incremental performance? [Y/n] ')
-	if resp == 'q':
+	if resp == controls['Quit']:
 		return
 	if resp == 'Y':
 		# Create model with tuned parameters
@@ -1223,7 +1423,7 @@ def run_PA(X, y, **kwargs):
 	
 	resp = raw_input('See performance with more than one epoch?\n'
 					 'Parameters will remain the same. [Y/n] ')
-	if resp == 'q':
+	if resp == controls['Quit']:
 		return
 	if resp == 'Y':
 		print 'Tuning number of epochs...'
@@ -1250,9 +1450,9 @@ def run_PA(X, y, **kwargs):
 		while True:
 			comp = raw_input('Compare errors for range of epoch values? [Y/n] ')
 			if comp == 'Y':
-				start = raw_input('Enter lower bound (inclusive) of range: ')
-				end = raw_input('Enter upper bound (exclusive) of range: ')
-				incr = raw_input('Enter increment: ')
+				start = raw_input('\tEnter lower bound (inclusive) of range: ')
+				end = raw_input('\tEnter upper bound (exclusive) of range: ')
+				incr = raw_input('\tEnter increment: ')
 				n_range = np.arange(int(start), int(end), int(incr))
 				avg_train_perf = []
 				avg_val_perf = []
@@ -1260,8 +1460,8 @@ def run_PA(X, y, **kwargs):
 				np.random.seed(seed)
 				indices_copy = copy.deepcopy(indices)
 				for n in n_range:
-					train_perf = []
-					val_perf = []
+					train_perf = np.array([])
+					val_perf = np.array([])
 
 					if shuffle:
 						np.random.shuffle(indices_copy)
@@ -1293,23 +1493,21 @@ def run_PA(X, y, **kwargs):
 									y_train[i:i + batch_size]
 									)
 						y_pred = model.predict(X_train)
-						train_perf.append(regression_performance(
+						train_perf = np.append(train_perf, [
+							regression_performance(
 							y_train,
 							y_pred,
 							'rms'
-							))
+							)])
 						y_pred = model.predict(X_val)
-						val_perf.append(regression_performance(
+						val_perf = np.append(val_perf, [
+							regression_performance(
 							y_val,
 							y_pred,
 							'rms'
-							))
-					avg_train_perf.append(
-						np.sum(train_perf) * 1.0 / len(train_perf)
-						)
-					avg_val_perf.append(
-						np.sum(val_perf) * 1.0 / len(val_perf)
-						)
+							)])
+					avg_train_perf.append(train_perf.mean())
+					avg_val_perf.append(val_perf.mean())
 				plot_hyperparameter(
 					n_range,
 					avg_train_perf,
@@ -1318,7 +1516,7 @@ def run_PA(X, y, **kwargs):
 						'parameter' : r'Epochs',
 						'score' : 'Root Mean Squared Error'
 					})
-			elif comp == 'q':
+			elif comp == controls['Quit']:
 				return
 			else:
 				break
@@ -1326,7 +1524,7 @@ def run_PA(X, y, **kwargs):
 		best_n_iter = 5 # Default
 		n_iter = raw_input('Enter the number of epochs (default: ' +
 							str(best_n_iter) + '): ')
-		if n_iter == 'q':
+		if n_iter == controls['Quit']:
 			return
 		if n_iter != '':
 			best_n_iter = int(n_iter)
@@ -1344,10 +1542,6 @@ def run_PA(X, y, **kwargs):
 			loss=loss,
 			)
 		for rnd in xrange(best_n_iter):
-			if shuffle:
-				np.random.shuffle(indices)
-				train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
-				outcomes = np.matrix([[y[0].A1[i]] for i in indices])
 			for i in xrange(0, total_training_instances, batch_size):
 				data = train_data[i:i + batch_size]
 				out = outcomes[i:i + batch_size]
@@ -1422,3 +1616,60 @@ def run_PA(X, y, **kwargs):
 		record_results(final_result, attributes, **{
 			'title': 'final results'
 			})
+
+def home_PA(X, y, **kwargs):
+	"""
+	Requests an action from the user to run the Passive-Aggressive algorithm on
+	the regression data.
+
+	Parameters
+	--------------------
+		X -- tuple of length 3, 
+			1. numpy matrix of shape (n_1,d), features for training
+			2. numpy matrix of shape (n_2,d), features for validation
+			3. numpy matrix of shape (n_3,d), features for test
+		y -- tuple of length 3,
+			1. numpy matrix of shape (n_1,1), targets for training
+			2. numpy matrix of shape (n_2,1), targets for validation
+			3. numpy matrix of shape (n_3,1), targets for test
+	"""
+
+	controls = ctrls()
+	suc = True
+	while True:
+		if suc:
+			print '#############'
+			print '## PA Home ##'
+			print '#############'
+		print 'How would you like to run Passive-Aggressive (PA)?'
+		print '1. Run manually.'
+		print '2. Run multiple times to get an average performance.'
+		print 'Quit to run on new data.'
+		pa_op = raw_input('Enter value: ')
+		if pa_op == controls['Help']:
+			print_controls()
+			suc = False
+		elif pa_op == controls['Quit']:
+			return
+		elif pa_op == controls['Skip']:
+			print ('Unable to skip. Press ' + controls['Quit'] +
+				   ' to exit.')
+			suc = False
+		elif pa_op == controls['Home']:
+			suc = False
+		else:
+			try:
+				pa_op = int(pa_op)
+				if pa_op not in [1, 2]:
+					print 'Invalid value. Try again.'
+				else:
+					if pa_op == 1:
+						run_PA(X, y, **kwargs)
+						suc = True
+					elif pa_op == 2:
+						run_multiple_PA(X, y, **kwargs)
+						suc = True
+			except ValueError:
+				suc = False
+				print 'Invalid value. Try again.'
+		print

@@ -1,31 +1,23 @@
 from data import PerfusionDataSet, NoDataError
-from models import run_SGD, run_PA
+from models import run_SGD, home_PA
+from controls import print_controls, ctrls
 import sys
 import numpy as np
 
-controls = {
-	'Help' : 'h',
-	'Home' : 'home',
-	'Skip' : '',
-	'Quit' : 'q'
-}
+home_options = [
+	'Evaluate perfusion parameter.',
+	'Plot from existing results.',
+	'Exit program.'
+]
 
-special_keys = {
-	'' : 'ENTER'
-}
-
-def print_controls():
-	print 'Controls:'
-	for name, key in controls.iteritems():
-		if key in special_keys:
-			key = special_keys[key]
-		print '\t' + name + ': [' + key + ']'
-	print
-
-def main():
-	print 'Welcome to Lesion Growth Predictor!'
-	print_controls()
+def evaluate_param():
+	controls = ctrls()
+	home = True
 	while True:
+		if home:
+			print '###############################'
+			print '## Parameter Evaluation Home ##'
+			print '###############################'
 		home = False
 
 		######################################################################
@@ -45,8 +37,7 @@ def main():
 			if param_val == controls['Skip']:
 				print 'Perfusion parameter is required.'
 			elif param_val == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
+				return
 			elif param_val == controls['Help']:
 				print_controls()
 			elif param_val == controls['Home']:
@@ -77,8 +68,7 @@ def main():
 			if patch_rad == controls['Skip']:
 				print 'Patch radius is required.'
 			elif patch_rad == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
+				return
 			elif patch_rad == controls['Help']:
 				print_controls()
 			elif patch_rad == controls['Home']:
@@ -132,8 +122,7 @@ def main():
 			if visualize == controls['Skip'] or visualize == 'n':
 				break
 			elif visualize == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
+				return
 			elif visualize == controls['Help']:
 				print_controls()
 			elif visualize == controls['Home']:
@@ -145,8 +134,7 @@ def main():
 					if display == 'n' or display == controls['Skip']:
 						continue
 					elif display == controls['Quit']:
-						print 'Exiting program.'
-						sys.exit()
+						return
 					elif display == controls['Help']:
 						print_controls()
 					elif display == controls['Home']:
@@ -165,8 +153,7 @@ def main():
 							print '3: Test'
 							data_type = raw_input('Enter value: ')
 							if data_type == controls['Quit']:
-								print 'Exiting program.'
-								sys.exit()
+								return
 							elif data_type == controls['Help']:
 								print_controls()
 							elif data_type == controls['Home']:
@@ -191,8 +178,7 @@ def main():
 												again = False
 												break
 											elif again == controls['Quit']:
-												print 'Exiting program.'
-												sys.exit()
+												return
 											elif again == controls['Help']:
 												print_controls()
 											elif again == controls['Home']:
@@ -238,17 +224,17 @@ def main():
 			if exe == 'n' or exe == controls['Skip']:
 				break
 			elif exe == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
+				return
 			elif exe == controls['Help']:
 				print_controls()
 			elif exe == controls['Home']:
 				home = True
 				break
 			elif exe == 'Y':
-				kwargs = {}
-				kwargs['parameter'] = param_name
-				kwargs['patch_radius'] = patch_rad
+				kwargs = {
+					'parameter' : param_name,
+					'patch_radius' : patch_rad
+				}
 				run_SGD(p_data.X, p_data.y, **kwargs)
 				break
 			else:
@@ -264,18 +250,18 @@ def main():
 			if exe == 'n' or exe == controls['Skip']:
 				break
 			elif exe == controls['Quit']:
-				print 'Exiting program.'
-				sys.exit()
+				return
 			elif exe == controls['Help']:
 				print_controls()
 			elif exe == controls['Home']:
 				home = True
 				break
 			elif exe == 'Y':
-				kwargs = {}
-				kwargs['parameter'] = param_name
-				kwargs['patch_radius'] = patch_rad
-				run_PA(p_data.X, p_data.y, **kwargs)
+				kwargs = {
+					'parameter' : param_name,
+					'patch_radius' : patch_rad
+				}
+				home_PA(p_data.X, p_data.y, **kwargs)
 				break
 			else:
 				print 'Invalid response. Try again.'
@@ -285,8 +271,7 @@ def main():
 			resp = raw_input('Run on another data set? [Y/n] ')
 			if resp == controls['Quit'] or resp == 'n' or \
 				 resp == controls['Skip']:
-				print 'Exiting program.'
-				sys.exit()
+				return
 			elif resp == controls['Help']:
 				print_controls()
 			elif resp == controls['Home']:
@@ -296,7 +281,57 @@ def main():
 				break
 			else:
 				print 'Invalid response. Try again.'
-		print
+
+def plot():
+	print 'Plot not implemented yet. Returning home.'
+
+def main():
+	print 'Welcome to Lesion Growth Predictor!'
+	print_controls()
+
+	controls = ctrls()
+	suc = True
+	while True:
+		if suc:
+			print '###############'
+			print '## MAIN Home ##'
+			print '###############'
+		print 'What would you like to do?'
+		for i, op in enumerate(home_options):
+			print str(i + 1) + ': ' + op
+		home_op = raw_input('Enter value: ')
+		if home_op == controls['Skip']:
+			print ('Unable to skip. Press ' + controls['Quit'] +
+				   ' to exit program.')
+			suc = False
+		elif home_op == controls['Quit']:
+			print 'Exiting program.'
+			sys.exit()
+		elif home_op == controls['Help']:
+			print_controls()
+			suc = False
+		elif home_op == controls['Home']:
+			suc = False
+		else:
+			try:
+				home_op = int(home_op)
+				if home_op not in xrange(1, len(home_options) + 1):
+					print 'Invalid value. Try again.'
+				else:
+					print
+					if home_op == 1:
+						evaluate_param()
+						suc = True
+					elif home_op == 2:
+						plot()
+						suc = True
+					elif home_op == 3:
+						print 'Exiting program.'
+						sys.exit()
+					print
+			except ValueError:
+				suc = False
+				print 'Invalid value.'
 
 if __name__ == "__main__" :
 	main()
