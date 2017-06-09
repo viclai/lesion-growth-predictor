@@ -1,5 +1,5 @@
 from data import PerfusionDataSet, NoDataError
-from models import run_SGD, home_PA
+from models import home_SGD, home_PA
 from controls import print_controls, ctrls
 import sys
 import numpy as np
@@ -235,7 +235,7 @@ def evaluate_param():
 					'parameter' : param_name,
 					'patch_radius' : patch_rad
 				}
-				run_SGD(p_data.X, p_data.y, **kwargs)
+				home_SGD(p_data.X, p_data.y, **kwargs)
 				break
 			else:
 				print 'Invalid response. Try again.'

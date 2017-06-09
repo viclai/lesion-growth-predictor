@@ -20,6 +20,352 @@ Steps to evaluate a ML technique:
 		-- Repeat Step 3 to find the best model.
 """
 
+def run_multiple_SGD(X, y, **kwargs):
+	"""
+	Runs Stochastic Gradient Descent algorithm multiple times
+		using different seeds on the regression data.
+
+	Parameters
+	--------------------
+		X -- tuple of length 3, 
+			1. numpy matrix of shape (n_1,d), features for training
+			2. numpy matrix of shape (n_2,d), features for validation
+			3. numpy matrix of shape (n_3,d), features for test
+		y -- tuple of length 3,
+			1. numpy matrix of shape (n_1,1), targets for training
+			2. numpy matrix of shape (n_2,1), targets for validation
+			3. numpy matrix of shape (n_3,1), targets for test
+	"""
+
+	total_training_instances = len(X[0])
+	controls = ctrls()
+
+	if 'parameter' not in kwargs:
+		perfusion_param = None
+	else:
+		perfusion_param = kwargs.pop('parameter')
+
+	if 'patch_radius' not in kwargs:
+		patch_radius = None
+	else:
+		patch_radius = kwargs.pop('patch_radius')
+
+	seeds = raw_input('Enter seeds (separated by space): ')
+	seeds = [int(s) for s in seeds.split()]
+
+	total_training_instances = len(X[0])
+	batch_size = 100
+	
+	# Shuffle data
+	indices = np.arange(0, total_training_instances)
+	np.random.seed(seeds[0])
+	np.random.shuffle(indices)
+	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
+	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
+	
+
+	
+
+
+
+	best_penalty = 'l2' # 
+	print 'Choose a penalty (regularization term) to be used.'
+	print '1: none'
+	print '2: l2'
+	print '3: l1'
+	print '4: elasticnet'
+	pick_penalty = raw_input('Enter value (default: 2): ')
+	if pick_penalty == controls['Quit']:
+		return
+	if pick_penalty == '1':
+		best_penalty = 'none'
+	elif pick_penalty == '3':
+		best_penalty = 'l1'
+	elif pick_penalty == '4':
+		best_penalty = 'elasticnet'
+	
+	
+	print 'Enter range of alpha term (default 0.0001) for penalty ' + best_penalty
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	alpha_range = np.arange(float(start), float(end), float(incr))
+	min_test_err = None
+	best_alpha = None
+	for a in alpha_range:
+		avg_test_errs = np.array([])
+		print "Testing alpha " + str(a)
+		for seed in seeds[1:]:
+			model = SGDRegressor(
+					penalty=best_penalty,
+					alpha = a,
+					random_state=np.random.RandomState(seed)
+					)
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i+batch_size]
+				out = outcomes[i:i+batch_size]
+				model = model.partial_fit(data, out.A1)						
+				
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs,[
+				regression_performance(y[2].A1,y_pred,'rms')
+				])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_alpha = a
+				
+
+			
+	best_learn = 'optimal' # Default
+	# 'none', 'l2', 'l1', or 'elasticnet'
+	print 'Choose a learning rate schedule to be used.'
+	print '1: Constant'
+	print '2: Optimal'
+	print '3: Inverse Scaling'
+	pick_learn = raw_input('Enter value (default: 2): ')
+	if pick_learn == controls['Quit']:
+		return
+	if pick_learn == '1':
+		best_learn = 'constant'
+	elif pick_learn == '3':
+		best_learn = 'invscaling'
+		
+	print 'Enter range of initial learning rate (default 0.01) '
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	learn_range = np.arange(float(start), float(end), float(incr))
+	min_test_err = None
+	best_learnRate = None
+	for a in learn_range:
+		avg_test_errs = np.array([])
+		print "Testing initial rate" + str(a)
+		for seed in seeds[1:]:
+			model = SGDRegressor(
+					learning_rate=best_learn,
+					eta0 = a,
+					random_state=np.random.RandomState(seed)
+					)
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i+batch_size]
+				out = outcomes[i:i+batch_size]
+				model = model.partial_fit(data, out.A1)						
+				
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs,[
+				regression_performance(
+				y[2].A1,
+				y_pred,
+				'rms'
+				)])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_learnRate = a
+			
+
+	
+	best_powT = 0.25
+	if best_learn == 'invscaling':
+		print 'Enter range of exponent for inverse scaling (default 0.25) '
+		start = raw_input('\tEnter lower bound (inclusive) of range: ')
+		end = raw_input('\tEnter upper bound (exclusive) of range: ')
+		incr = raw_input('\tEnter increment: ')
+		exp_range = np.arange(float(start), float(end), float(incr))
+		min_test_err = None
+		best_powT = None
+		for a in exp_range:
+			print "Testing exponent " + str(a)
+			avg_test_errs = np.array([])
+			for seed in seeds[1:]:
+				model = SGDRegressor(
+						learning_rate=best_learn,
+						eta0 = a,
+						power_t = a,
+						random_state=np.random.RandomState(seed)
+						)
+				for i in xrange(0, total_training_instances, batch_size):
+					data = train_data[i:i+batch_size]
+					out = outcomes[i:i+batch_size]
+					model = model.partial_fit(data, out.A1)						
+					
+				y_pred = model.predict(X[2])
+				avg_test_errs = np.append(avg_test_errs,[
+					regression_performance(
+					y[2].A1,
+					y_pred,
+					'rms'
+					)])
+			err = avg_test_errs.mean()
+			if min_test_err is None or err < min_test_err:
+				min_test_err = err
+				best_powT = a
+	
+	# default = 0.1
+	print 'Enter range of epsilon.'
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	epsilon_range = np.arange(float(start), float(end), float(incr))
+	min_test_err = None
+	best_epsilon = None
+	for e in epsilon_range:
+		avg_test_errs = np.array([])
+		print "Testing epsilon value " + str(e)
+		for seed in seeds[1:]:
+			model = SGDRegressor(
+				epsilon=e,
+				random_state=np.random.RandomState(seed)
+				)
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i + batch_size]
+				out = outcomes[i:i + batch_size]
+				model = model.partial_fit(data, out.A1)
+
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs, [
+				regression_performance(y[2].A1, y_pred, 'rms')
+				])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_epsilon = e
+
+	print 'Enter range of epochs.'
+	start = raw_input('\tEnter lower bound (inclusive) of range: ')
+	end = raw_input('\tEnter upper bound (exclusive) of range: ')
+	incr = raw_input('\tEnter increment: ')
+	epoch_range = np.arange(int(start), int(end), int(incr))
+	min_test_err = None
+	best_epochs = None
+	for e in epoch_range:
+		avg_test_errs = np.array([])
+		print "Testing epoch number " + str(e)
+		for seed in seeds[1:]:
+			model = PassiveAggressiveRegressor(
+				random_state=np.random.RandomState(seed)
+				)
+			for rnd in xrange(e):
+				for i in xrange(0, total_training_instances, batch_size):
+					data = train_data[i:i + batch_size]
+					out = outcomes[i:i + batch_size]
+					model = model.partial_fit(data, out.A1)
+
+			y_pred = model.predict(X[2])
+			avg_test_errs = np.append(avg_test_errs, [
+				regression_performance(y[2].A1, y_pred, 'rms')
+				])
+		err = avg_test_errs.mean()
+		if min_test_err is None or err < min_test_err:
+			min_test_err = err
+			best_epochs = e
+
+		
+	attributes = [
+		'Perfusion Parameter',
+		'Model',
+		'Patch Radius',
+		'Batch Size',
+		'Total Number of Examples Trained',
+		'Trial',
+		'Training RMSE',
+		'Test RMSE',
+		'Training R^2 Score',
+		'Test R^2 Score',
+		'Penalty (Regularization)', 
+		'Alpha',
+		'Epsilon',
+		'Learning Rate',
+		'eta0', # The initial learning rate [default 0.01].
+		'Exponent (inv scaling)', # The exponent for inverse scaling learning rate [default 0.25].
+		'Epochs',
+		'Fit Intercept?',
+		'Shuffle?',
+		'Loss Function',
+		'Warm Start?',
+		'Average'
+	] ## might add/ change one of these attributes
+	
+	# Pick values for parameters
+	results = {}
+	for a in attributes:
+		results[a] = []
+		
+
+	trials = raw_input('Enter number of trials: ')
+	trials = int(trials)
+
+	indices = np.arange(0, total_training_instances)
+	np.random.shuffle(indices)
+	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
+	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
+
+	np.random.seed(None)
+	
+	# Create model with tuned parameters
+	for trial in xrange(trials):
+		model = SGDRegressor(
+			penalty=best_penalty,
+			alpha=best_alpha,
+			epsilon=best_epsilon,
+			fit_intercept=True,
+			n_iter=1, # Not applicable for partial fit
+			shuffle=True,
+			random_state=None,
+			loss='epsilon_insensitive',
+			average=False,
+			learning_rate=best_learn,
+			eta0 = best_learnRate,
+			power_t=best_powT
+			)
+		for rnd in xrange(best_epochs):
+			for i in xrange(0, total_training_instances, batch_size):
+				data = train_data[i:i + batch_size]
+				out = outcomes[i:i + batch_size]
+				model = model.partial_fit(data, out.A1)
+				
+		results['Perfusion Parameter'].append(perfusion_param)
+		results['Model'].append('SGD')
+		results['Patch Radius'].append(patch_radius)
+		results['Batch Size'].append(batch_size)
+		results['Penalty (Regularization)'].append(best_penalty)
+		results['Alpha'].append(best_alpha)
+		results['Average'].append(False)
+		results['Epsilon'].append(best_epsilon)
+		results['Fit Intercept?'].append(True)
+		results['Shuffle?'].append(True)
+		results['Random Seed'].append(seed)
+		results['Loss Function'].append('epsilon_insensitive')
+		results['Warm Start?'].append(False)
+		results['Learning Rate'].append(best_learn)
+		results['Trial'].append(trial + 1)
+		results['eta0'].append(best_learnRate)
+		results['Exponent (inv scaling)'].append(best_powT)
+		results['Total Number of Examples Trained'].append(
+				total_training_instances
+				)
+
+		# Compute training performance
+		y_pred = model.predict(X[0])
+		overall_train_perf = regression_performance(y[0].A1,y_pred,'rms')
+		
+		results['Training RMSE'].append(overall_train_perf)
+		overall_train_perf = regression_performance(y[0].A1,y_pred,'r2-score')
+		results['Training R^2 Score'].append(overall_train_perf)
+
+		# Compute test performance using test data
+		y_pred = model.predict(X[2])
+		test_perf = regression_performance(y[2].A1,y_pred,'rms')
+		results['Test RMSE'].append(test_perf)
+		test_perf = regression_performance(y[2].A1,y_pred,'r2-score')
+		results['Test R^2 Score'].append(test_perf)
+		
+	record_results(results, attributes, **{
+		'title': 'trial results'
+		})
+
+
 def run_SGD(X, y, **kwargs):
 	"""
 	Runs Stochastic Gradient Descent on the regression data.
@@ -838,6 +1184,65 @@ def run_SGD(X, y, **kwargs):
 			})
 	print 'Done'
 
+
+def home_SGD(X, y, **kwargs):
+	"""
+	Requests an action from the user to run the Stochastic Gradient
+	Descent	algorithm on the regression data.
+
+	Parameters
+	--------------------
+		X -- tuple of length 3, 
+			1. numpy matrix of shape (n_1,d), features for training
+			2. numpy matrix of shape (n_2,d), features for validation
+			3. numpy matrix of shape (n_3,d), features for test
+		y -- tuple of length 3,
+			1. numpy matrix of shape (n_1,1), targets for training
+			2. numpy matrix of shape (n_2,1), targets for validation
+			3. numpy matrix of shape (n_3,1), targets for test
+	"""
+
+	controls = ctrls()
+	suc = True
+	while True:
+		if suc:
+			print '##############'
+			print '## SGD Home ##'
+			print '##############'
+		print 'How would you like to run Stochastic Gradient Descent(SGD)?'
+		print '1. Run manually.'
+		print '2. Run multiple times to get an average performance.'
+		print 'Quit to run on new data.'
+		pa_op = raw_input('Enter value: ')
+		if pa_op == controls['Help']:
+			print_controls()
+			suc = False
+		elif pa_op == controls['Quit']:
+			return
+		elif pa_op == controls['Skip']:
+			print ('Unable to skip. Press ' + controls['Quit'] +
+				   ' to exit.')
+			suc = False
+		elif pa_op == controls['Home']:
+			suc = False
+		else:
+			try:
+				pa_op = int(pa_op)
+				if pa_op not in [1, 2]:
+					print 'Invalid value. Try again.'
+				else:
+					if pa_op == 1:
+						run_SGD(X, y, **kwargs)
+						suc = True
+					elif pa_op == 2:
+						run_multiple_SGD(X, y, **kwargs)
+						suc = True
+			except ValueError:
+				suc = False
+				print 'Invalid value. Try again.'
+		print
+
+	
 def run_multiple_PA(X, y, **kwargs):
 	"""
 	Runs the Passive-Aggressive algorithm multiple times, using different
