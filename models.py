@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import os
 import copy
+import traceback
 
 """
 Steps to evaluate a ML technique:
@@ -302,9 +303,10 @@ def run_multiple_SGD(X, y, **kwargs):
 	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
 
 	np.random.seed(None)
-	
+	print "Begin multiple trials test"
 	# Create model with tuned parameters
 	for trial in xrange(trials):
+		print "Trial #"+str(trial)
 		model = SGDRegressor(
 			penalty=best_penalty,
 			alpha=best_alpha,
@@ -320,6 +322,7 @@ def run_multiple_SGD(X, y, **kwargs):
 			power_t=best_powT
 			)
 		for rnd in xrange(best_epochs):
+			print "Epoch #"+str(rnd) + " in trial " +str(trial)
 			for i in xrange(0, total_training_instances, batch_size):
 				data = train_data[i:i + batch_size]
 				out = outcomes[i:i + batch_size]
@@ -335,7 +338,7 @@ def run_multiple_SGD(X, y, **kwargs):
 		results['Epsilon'].append(best_epsilon)
 		results['Fit Intercept?'].append(True)
 		results['Shuffle?'].append(True)
-		results['Random Seed'].append(seed)
+		results['Epochs'].append(best_epochs)
 		results['Loss Function'].append('epsilon_insensitive')
 		results['Warm Start?'].append(False)
 		results['Learning Rate'].append(best_learn)
@@ -419,8 +422,7 @@ def run_SGD(X, y, **kwargs):
 		'Loss Function',
 		'Warm Start?',
 		'Average'
-	] ## might add/ change one of these attributes
-	# eta0 , learning_rate (learning rate schedule), power_t (for inv scaling learning rate)
+	] 
 	
 	
 	# Pick values for parameters
@@ -1239,6 +1241,7 @@ def home_SGD(X, y, **kwargs):
 						suc = True
 			except ValueError:
 				suc = False
+				traceback.print_exc()
 				print 'Invalid value. Try again.'
 		print
 
