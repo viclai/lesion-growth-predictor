@@ -101,9 +101,14 @@ def label_distribution(y, binsize=1, **kwargs):
 		label_name = kwargs.pop('label_name') + ' Value'
 
 	if 'title' not in kwargs:
-		title = ''
+		title = None
 	else:
 		title = kwargs.pop('title')
+
+	if 'fontsize' not in kwargs:
+		fontsize = None
+	else:
+		fontsize = kwargs.pop('fontsize')
 
 	slots = [((slot / binsize) * binsize) + binsize if slot % binsize != 0
 		else slot for slot in np.ceil(y).A1.astype(int)
@@ -116,9 +121,10 @@ def label_distribution(y, binsize=1, **kwargs):
 
 	plt.clf()
 	plt.bar(label_values, frequencies, **kwargs)
-	plt.xlabel(label_name, fontsize=16)
-	plt.ylabel('Frequency', fontsize=16)
-	plt.title(title, fontsize=16)
+	kwargs['color'] = 'k' # Make axes labels black
+	plt.xlabel(label_name, fontsize=fontsize, **kwargs)
+	plt.ylabel('Frequency', fontsize=fontsize, **kwargs)
+	plt.title(title, fontsize=fontsize, **kwargs)
 	plt.ion()
 	plt.draw()
 	plt.pause(0.001)
@@ -347,7 +353,7 @@ def record_results(res, order=None, dir='results', **kwargs):
 		)
 	print name.title() + ' written to ' + file_path + '.'
 
-def scatter_plot_from_csv(filepath, split, attr, **kwargs):
+def scatter_plot_from_csv(filepath, split, xlabel, attr, err=None, **kwargs):
 	"""
 	Displays a scatter plot from a CSV file.
 
@@ -356,6 +362,7 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 		filepath -- path to CSV
 		split    -- string, attribute (column) to split on
 		attr     -- list of strings, values of attributes to plot
+		err      -- list of strings, values of error attributes
 	"""
 
 	"""
@@ -375,6 +382,11 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 	else:
 		ylabel = kwargs.pop('ylabel')
 
+	if 'fontsize' not in kwargs:
+		fontsize = None
+	else:
+		fontsize = kwargs.pop('fontsize')
+
 	try:
 		df = pd.read_csv(filepath)
 	except IOError:
@@ -386,6 +398,9 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 	patches = []
 	lines = []
 
+	if err is None:
+		err = [None for a in attr]
+
 	plt.clf()
 	ax = plt.subplot(111)
 	for i, category in enumerate(categories):
@@ -393,15 +408,32 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 		cur_df = df.loc[df[split] == category]
 		d = cur_df.to_dict('list')
 
-		x = d[attr[0]]
-		for j, a in enumerate(attr[1:]):
+		x = d[xlabel]
+		for j, (a, e) in enumerate(zip(attr, err)):
 			if one_class:
 				color = colors[j]
 			else:
 				color = colors[i]
-			ax.scatter(x, d[a], color=color, marker=markers[j], label=a)
 
-			if i == 0:
+			ebar = None if e is None else d[e]
+			ax.errorbar(
+				x,
+				d[a],
+				ebar,
+				color=color,
+				marker=markers[j],
+				label=a
+				)
+
+			if one_class:
+				lines.append(mlines.Line2D(
+					[],
+					[],
+					color=colors[j],
+					marker=markers[j],
+					label=a
+					))
+			elif i == 0:
 				lines.append(mlines.Line2D(
 					[],
 					[],
@@ -432,14 +464,14 @@ def scatter_plot_from_csv(filepath, split, attr, **kwargs):
 		handles=lines,
 		bbox_to_anchor=(1, 0.75)
 		)
-	plt.xlabel(attr[0], **kwargs)
-	plt.ylabel(ylabel, **kwargs)
-	plt.title(title, **kwargs)
+	plt.xlabel(xlabel, fontsize=fontsize, **kwargs)
+	plt.ylabel(ylabel, fontsize=fontsize, **kwargs)
+	plt.title(title, fontsize=fontsize, **kwargs)
 	plt.ion()
 	plt.draw()
 	plt.pause(0.001)
 
-def histogram_from_csv(filepath, split, xlabel, ylabel, **kwargs):
+def histogram_from_csv(filepath, split, xlabel, ylabel, yerr=None, **kwargs):
 	"""
 	Displays a histogram (bar graph) from a CSV file.
 
@@ -449,15 +481,22 @@ def histogram_from_csv(filepath, split, xlabel, ylabel, **kwargs):
 		split    -- string, attribute (column) to split on
 		xlabel   -- string, label of horizontal axis
 		ylabel   -- string, label of vertical axis
+		yerr     -- string, label of y-errors
 	"""
 
-	# Add more colors if needed. Google 'matplotlib colors'.
-	colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
+	# More colors can be specified by HTML hex string, (r, g, b), or
+	# (r, g, b, a)
+	colors = ['b', 'r', 'g', 'c', 'm', 'y', '#A0A0A0', 'k']
 
 	if 'title' not in kwargs:
 		title = ''
 	else:
 		title = kwargs.pop('title')
+
+	if 'fontsize' not in kwargs:
+		fontsize = None
+	else:
+		fontsize = kwargs.pop('fontsize')
 
 	try:
 		df = pd.read_csv(filepath)
@@ -474,13 +513,14 @@ def histogram_from_csv(filepath, split, xlabel, ylabel, **kwargs):
 	total_width = bin_width * len(categories)
 
 	plt.clf()
-	plt.subplot(111)
+	ax = plt.subplot(111)
 	for i, category in enumerate(categories):
 		patches.append(mpatches.Patch(color=colors[i], label=category))
 		cur_df = df.loc[df[split] == category]
 		d = cur_df.to_dict('list')
 
 		y = []
+		y_err = None if yerr == None else []
 		for label in labels:
 			cc_df = cur_df.loc[cur_df[xlabel] == label]
 			if len(cc_df) != 1:
@@ -488,14 +528,22 @@ def histogram_from_csv(filepath, split, xlabel, ylabel, **kwargs):
 				return
 			d = cc_df.to_dict('list')
 			y.append(d[ylabel][0])
-		plt.bar(x + (bin_width * i), y, color=colors[i], width=bin_width)
+			if yerr is not None:
+				y_err.append(d[yerr][0])
+		plt.bar(
+			x + (bin_width * i),
+			y,
+			color=colors[i],
+			width=bin_width,
+			yerr=y_err
+			)
 
 	legend = plt.legend(loc='best', fontsize=8, handles=patches, title=split)
 	legend.get_title().set_fontsize('8')
 	plt.xticks(x + ((bin_width / 2) * (len(categories) - 1)), labels)
-	plt.xlabel(xlabel, **kwargs)
-	plt.ylabel(ylabel, **kwargs)
-	plt.title(title, **kwargs)
+	plt.xlabel(xlabel, fontsize=fontsize, **kwargs)
+	plt.ylabel(ylabel, fontsize=fontsize, **kwargs)
+	plt.title(title, fontsize=fontsize, **kwargs)
 	plt.ion()
 	plt.draw()
 	plt.pause(0.001)
