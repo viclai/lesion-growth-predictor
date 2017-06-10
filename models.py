@@ -305,8 +305,12 @@ def run_multiple_SGD(X, y, **kwargs):
 	np.random.seed(None)
 	print "Begin multiple trials test"
 	# Create model with tuned parameters
+	prev = -1
 	for trial in xrange(trials):
-		print "Trial #"+str(trial)
+		if int(((trial*100.0)/trials)) % 10 == 0 and int(((trial*100.0)/trials)) != prev: 
+			#display a note every 10% so user knows program didn't freeze
+				prev = int(((trial*100.0)/trials))
+				print "Trials " + str(prev) + "% complete"
 		model = SGDRegressor(
 			penalty=best_penalty,
 			alpha=best_alpha,
@@ -322,7 +326,6 @@ def run_multiple_SGD(X, y, **kwargs):
 			power_t=best_powT
 			)
 		for rnd in xrange(best_epochs):
-			print "Epoch #"+str(rnd) + " in trial " +str(trial)
 			for i in xrange(0, total_training_instances, batch_size):
 				data = train_data[i:i + batch_size]
 				out = outcomes[i:i + batch_size]
