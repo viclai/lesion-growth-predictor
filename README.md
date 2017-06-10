@@ -4,6 +4,8 @@
 project in development which predicts lesion growth for patients with stroke.
 Read about our findings [here](https://sites.google.com/g.ucla.edu/predicting-lesion-growth).
 
+![Demo](hub/demo.gif "Program demo")
+
 # Data
 Please contact [Fabien Scalzo](http://web.cs.ucla.edu/~fab/) to access the data
 used for this project. Specifically ask for the matrices.
