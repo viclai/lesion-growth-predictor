@@ -1,4 +1,5 @@
 extracted_data/*
 **/*.pyc
 stats/*
-results/*
+csv/*
+plots/*

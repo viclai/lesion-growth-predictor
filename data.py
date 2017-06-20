@@ -122,7 +122,7 @@ class PerfusionDataSet(DataSet):
 
 		curves = X.shape[0]
 		points = X.shape[1]
-		time_interval = 2 # Number of seconds that separates each concentration 
+		time_interval = 2 # Number of seconds that separates each concentration
 		                  # level
 		time = np.arange(0, points * time_interval, time_interval)
 		plt.ion()

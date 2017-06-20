@@ -39,6 +39,7 @@ packages are used in the scripts.
 * [scipy](https://www.scipy.org/)
 * [scikit-learn](http://scikit-learn.org/stable/)
 * [pandas](http://pandas.pydata.org/)
+# [plotly](https://plot.ly/)
 
 # Usage
 Note that there is no dataset published to this repository, so make sure a 

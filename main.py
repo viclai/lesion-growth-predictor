@@ -15,9 +15,9 @@ def evaluate_param():
 	home = True
 	while True:
 		if home:
-			print '###############################'
-			print '## Parameter Evaluation Home ##'
-			print '###############################'
+			print '#################################'
+			print '## Parameter Evaluation - Home ##'
+			print '#################################'
 		home = False
 
 		######################################################################
@@ -293,9 +293,9 @@ def main():
 	suc = True
 	while True:
 		if suc:
-			print '###############'
-			print '## MAIN Home ##'
-			print '###############'
+			print '#################'
+			print '## MAIN - Home ##'
+			print '#################'
 		print 'What would you like to do?'
 		for i, op in enumerate(home_options):
 			print str(i + 1) + ': ' + op

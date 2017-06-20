@@ -21,10 +21,14 @@ Steps to evaluate a ML technique:
 		-- Repeat Step 3 to find the best model.
 """
 
+##############################################################################
+# Stochastic Gradient Descent
+##############################################################################
+
 def run_multiple_SGD(X, y, **kwargs):
 	"""
 	Runs Stochastic Gradient Descent algorithm multiple times
-		using different seeds on the regression data.
+	using different seeds on the regression data.
 
 	Parameters
 	--------------------
@@ -63,13 +67,8 @@ def run_multiple_SGD(X, y, **kwargs):
 	np.random.shuffle(indices)
 	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
 	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
-	
 
-	
-
-
-
-	best_penalty = 'l2' # 
+	best_penalty = 'l2'
 	print 'Choose a penalty (regularization term) to be used.'
 	print '1: none'
 	print '2: l2'
@@ -84,8 +83,7 @@ def run_multiple_SGD(X, y, **kwargs):
 		best_penalty = 'l1'
 	elif pick_penalty == '4':
 		best_penalty = 'elasticnet'
-	
-	
+
 	print 'Enter range of alpha term (default 0.0001) for penalty ' + best_penalty
 	start = raw_input('\tEnter lower bound (inclusive) of range: ')
 	end = raw_input('\tEnter upper bound (exclusive) of range: ')
@@ -105,7 +103,7 @@ def run_multiple_SGD(X, y, **kwargs):
 			for i in xrange(0, total_training_instances, batch_size):
 				data = train_data[i:i+batch_size]
 				out = outcomes[i:i+batch_size]
-				model = model.partial_fit(data, out.A1)						
+				model = model.partial_fit(data, out.A1)
 				
 			y_pred = model.predict(X[2])
 			avg_test_errs = np.append(avg_test_errs,[
@@ -115,9 +113,7 @@ def run_multiple_SGD(X, y, **kwargs):
 		if min_test_err is None or err < min_test_err:
 			min_test_err = err
 			best_alpha = a
-				
 
-			
 	best_learn = 'optimal' # Default
 	# 'none', 'l2', 'l1', or 'elasticnet'
 	print 'Choose a learning rate schedule to be used.'
@@ -131,7 +127,7 @@ def run_multiple_SGD(X, y, **kwargs):
 		best_learn = 'constant'
 	elif pick_learn == '3':
 		best_learn = 'invscaling'
-		
+
 	print 'Enter range of initial learning rate (default 0.01) '
 	start = raw_input('\tEnter lower bound (inclusive) of range: ')
 	end = raw_input('\tEnter upper bound (exclusive) of range: ')
@@ -151,7 +147,7 @@ def run_multiple_SGD(X, y, **kwargs):
 			for i in xrange(0, total_training_instances, batch_size):
 				data = train_data[i:i+batch_size]
 				out = outcomes[i:i+batch_size]
-				model = model.partial_fit(data, out.A1)						
+				model = model.partial_fit(data, out.A1)
 				
 			y_pred = model.predict(X[2])
 			avg_test_errs = np.append(avg_test_errs,[
@@ -164,9 +160,7 @@ def run_multiple_SGD(X, y, **kwargs):
 		if min_test_err is None or err < min_test_err:
 			min_test_err = err
 			best_learnRate = a
-			
 
-	
 	best_powT = 0.25
 	if best_learn == 'invscaling':
 		print 'Enter range of exponent for inverse scaling (default 0.25) '
@@ -189,7 +183,7 @@ def run_multiple_SGD(X, y, **kwargs):
 				for i in xrange(0, total_training_instances, batch_size):
 					data = train_data[i:i+batch_size]
 					out = outcomes[i:i+batch_size]
-					model = model.partial_fit(data, out.A1)						
+					model = model.partial_fit(data, out.A1)
 					
 				y_pred = model.predict(X[2])
 				avg_test_errs = np.append(avg_test_errs,[
@@ -202,7 +196,7 @@ def run_multiple_SGD(X, y, **kwargs):
 			if min_test_err is None or err < min_test_err:
 				min_test_err = err
 				best_powT = a
-	
+
 	# default = 0.1
 	print 'Enter range of epsilon.'
 	start = raw_input('\tEnter lower bound (inclusive) of range: ')
@@ -262,7 +256,6 @@ def run_multiple_SGD(X, y, **kwargs):
 			min_test_err = err
 			best_epochs = e
 
-		
 	attributes = [
 		'Perfusion Parameter',
 		'Model',
@@ -287,12 +280,11 @@ def run_multiple_SGD(X, y, **kwargs):
 		'Warm Start?',
 		'Average'
 	] ## might add/ change one of these attributes
-	
+
 	# Pick values for parameters
 	results = {}
 	for a in attributes:
 		results[a] = []
-		
 
 	trials = raw_input('Enter number of trials: ')
 	trials = int(trials)
@@ -330,7 +322,7 @@ def run_multiple_SGD(X, y, **kwargs):
 				data = train_data[i:i + batch_size]
 				out = outcomes[i:i + batch_size]
 				model = model.partial_fit(data, out.A1)
-				
+
 		results['Perfusion Parameter'].append(perfusion_param)
 		results['Model'].append('SGD')
 		results['Patch Radius'].append(patch_radius)
@@ -370,7 +362,6 @@ def run_multiple_SGD(X, y, **kwargs):
 	record_results(results, attributes, **{
 		'title': 'trial results'
 		})
-
 
 def run_SGD(X, y, **kwargs):
 	"""
@@ -426,8 +417,7 @@ def run_SGD(X, y, **kwargs):
 		'Warm Start?',
 		'Average'
 	] 
-	
-	
+
 	# Pick values for parameters
 	results = {}
 	for a in attributes:
@@ -457,7 +447,7 @@ def run_SGD(X, y, **kwargs):
 	np.random.shuffle(indices)
 	train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
 	outcomes = np.matrix([[y[0].A1[i]] for i in indices])
-	
+
 	best_penalty = 'l2' # Default
 	# 'none', 'l2', 'l1', or 'elasticnet'
 	print 'Choose a penalty (regularization term) to be used.'
@@ -474,8 +464,7 @@ def run_SGD(X, y, **kwargs):
 		best_penalty = 'l1'
 	elif pick_penalty == '4':
 		best_penalty = 'elasticnet'
-	
-		
+
 	print 'Tuning regularization penalty with alpha term...'
 	while True:
 		comp = raw_input('Compare errors for range of alpha values? [Y/n] ')
@@ -539,8 +528,7 @@ def run_SGD(X, y, **kwargs):
 			return
 		else:
 			break
-		
-			
+
 	best_alpha = 0.0001 # Default
 	alpha_pick = raw_input('Choose value of alpha (default: ' + str(best_alpha) + '): ')
 	if alpha_pick != '':
@@ -559,7 +547,7 @@ def run_SGD(X, y, **kwargs):
 		best_learn = 'constant'
 	elif pick_learn == '3':
 		best_learn = 'invscaling'
-		
+
 	print 'Tuning initial learning rate for ' +  best_learn + '...'
 	while True:
 		comp = raw_input('Compare errors for range of initial learning rates (default 0.01)? [Y/n] ')
@@ -633,7 +621,7 @@ def run_SGD(X, y, **kwargs):
 		return
 	if learnrate_PICK != '':
 		best_learnRate = float(learnrate_PICK)
-	
+
 	best_powT = 0.25
 	if best_learn == 'invscaling':
 		print 'Tuning exponent for inverse scaling learning rate...'
@@ -790,7 +778,6 @@ def run_SGD(X, y, **kwargs):
 	if shuffle_pick == 'n':
 		shuffle = False
 
-
 	# fit_intercept
 	intercept = True # Default
 	pick_intercept = raw_input('Fit intercept (default: Y)? [Y/n] ')
@@ -823,7 +810,6 @@ def run_SGD(X, y, **kwargs):
 		loss = 'epsilon_insensitive'
 	elif pick_loss == '4':
 		loss = 'squared_epsilon_insensitive'
-
 
 	##########################################################################
 	# Observe performance of model for each batch that has been trained on.
@@ -914,7 +900,6 @@ def run_SGD(X, y, **kwargs):
 				)
 			results['Test R^2 Score'].append(test_perf)
 
-		
 		record_results(results, attributes, **{
 			'title': 'incremental results'
 			})
@@ -925,7 +910,7 @@ def run_SGD(X, y, **kwargs):
 			results['Test RMSE'],
 			**{ 'score' : 'Root Mean Squared Error' }
 			)
-			
+
 		final_result = {}
 		for attr in results:
 			final_result[attr] = [results[attr][-1]]
@@ -935,8 +920,6 @@ def run_SGD(X, y, **kwargs):
 			'title': 'final results'
 			})
 
-
-			
 		# Print summary
 		print '================'
 		print 'SUMMARY'
@@ -974,9 +957,9 @@ def run_SGD(X, y, **kwargs):
 				str(final_result['Test R^2 Score'][0]))
 		print
 
-		
-		# Observe performance of model with more than 1 epoch.
-		
+	##########################################################################
+	# Observe performance of model with more than 1 epoch.
+	##########################################################################
 	resp = raw_input('See performance with more than one epoch?\n'
 					 'Parameters will remain the same. [Y/n] ')
 	if resp == controls['Quit']:
@@ -986,7 +969,7 @@ def run_SGD(X, y, **kwargs):
 		final_result = {}
 		for a in attributes:
 			final_result[a] = []
-		
+
 		final_result['Perfusion Parameter'].append(perfusion_param)
 		final_result['Model'].append('SGD')
 		final_result['Patch Radius'].append(patch_radius)
@@ -1006,8 +989,7 @@ def run_SGD(X, y, **kwargs):
 		final_result['Total Number of Examples Trained'].append(
 			total_training_instances
 		)
-				
-		
+
 		while True:
 			comp = raw_input('Compare errors for range of epoch values? [Y/n] ')
 			if comp == 'Y':
@@ -1022,7 +1004,7 @@ def run_SGD(X, y, **kwargs):
 				for n in n_range:
 					train_perf = []
 					val_perf = []
-				
+
 					if shuffle:
 						np.random.shuffle(indices)
 						train_data = np.matrix([np.asarray(X[0])[i] for i in indices])
@@ -1146,8 +1128,7 @@ def run_SGD(X, y, **kwargs):
 		
 		if 'Epochs' not in attributes:
 			attributes.append('Epochs')
-		
-		
+
 		# Print summary
 		print '================'
 		print 'SUMMARY'
@@ -1188,7 +1169,6 @@ def run_SGD(X, y, **kwargs):
 			'title': 'final results'
 			})
 	print 'Done'
-
 
 def home_SGD(X, y, **kwargs):
 	"""
@@ -1248,7 +1228,10 @@ def home_SGD(X, y, **kwargs):
 				print 'Invalid value. Try again.'
 		print
 
-	
+##############################################################################
+# Passive Aggressive Regressor
+##############################################################################
+
 def run_multiple_PA(X, y, **kwargs):
 	"""
 	Runs the Passive-Aggressive algorithm multiple times, using different
@@ -1588,8 +1571,8 @@ def run_PA(X, y, **kwargs):
 				C_range,
 				avg_train_perf,
 				avg_val_perf,
-				**{
-					'parameter' : r'Regularization $C$',
+				**{ # Plotly doesn't fully support LaTeX strings
+					'parameter' : 'Regularization',
 					'score' : 'Root Mean Squared Error'
 				})
 		elif comp == controls['Quit']:
@@ -1654,8 +1637,8 @@ def run_PA(X, y, **kwargs):
 				epsilon_range,
 				avg_train_perf,
 				avg_val_perf,
-				**{
-					'parameter' : r'Epsilon $\epsilon$',
+				**{ # Plotly doesn't fully support LaTeX strings
+					'parameter' : 'Epsilon',
 					'score' : 'Root Mean Squared Error'
 				})
 		elif comp == controls['Quit']:
@@ -1779,6 +1762,7 @@ def run_PA(X, y, **kwargs):
 			incremental_sizes,
 			results['Training RMSE'],
 			results['Test RMSE'],
+			# Plotly doesn't fully support LaTeX strings
 			**{ 'score' : 'Root Mean Squared Error' }
 			)
 
@@ -1824,6 +1808,7 @@ def run_PA(X, y, **kwargs):
 				str(final_result['Test R^2 Score'][0]))
 		print
 
+		attributes.remove('Epochs')
 		record_results(results, attributes, **{
 			'title': 'incremental results'
 			})
@@ -1831,7 +1816,6 @@ def run_PA(X, y, **kwargs):
 	##########################################################################
 	# Observe performance of model with more than 1 epoch.
 	##########################################################################
-	
 	resp = raw_input('See performance with more than one epoch?\n'
 					 'Parameters will remain the same. [Y/n] ')
 	if resp == controls['Quit']:
@@ -1923,8 +1907,8 @@ def run_PA(X, y, **kwargs):
 					n_range,
 					avg_train_perf,
 					avg_val_perf,
-					**{
-						'parameter' : r'Epochs',
+					**{ # Plotly doesn't fully support LaTeX strings
+						'parameter' : 'Epochs',
 						'score' : 'Root Mean Squared Error'
 					})
 			elif comp == controls['Quit']:
