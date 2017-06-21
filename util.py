@@ -638,6 +638,11 @@ def scatter_plot_from_csv(filepath, split, xlabel, attr, err=None, dir='plots',
 
 			x = d[xlabel]
 			for j, (a, e) in enumerate(zip(attr, err)):
+				if one_class:
+					color = rgb_colors[j]
+				else:
+					color = rgb_colors[i]
+
 				ebar = None if e is None else d[e]
 				data.append(
 					go.Scatter(
@@ -651,30 +656,31 @@ def scatter_plot_from_csv(filepath, split, xlabel, attr, err=None, dir='plots',
 						marker=dict(
 							symbol=plotly_markers[j],
 							size=10,
-							color=rgb_colors[i],
-							line=dict(color=rgb_colors[i])
+							color=color,
+							line=dict(color=color)
 						),
 						name=a,
 						legendgroup=category
 					)
 				)
-			annotations.append(dict(
-					x=x[-1],
-					y=d[attr[0]][-1],
-					xref='x',
-					yref='y',
-					text=category,
-					showarrow=True,
-					font=dict(
-						family='Courier New, monospace',
-						size=30,
-						color=rgb_colors[i]
-					),
-					align='center',
-					ax=100,
-					ay=0
+			if not one_class:
+				annotations.append(dict(
+						x=x[-1],
+						y=d[attr[0]][-1],
+						xref='x',
+						yref='y',
+						text=category,
+						showarrow=True,
+						font=dict(
+							family='Courier New, monospace',
+							size=30,
+							color=rgb_colors[i]
+						),
+						align='center',
+						ax=100,
+						ay=0
+					)
 				)
-			)
 		layout = go.Layout(
 			title=title,
 			xaxis=dict(

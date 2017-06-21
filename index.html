@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Predicting Lesion Growth</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+		<link rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="styles.css" />
+
+		<script type="text/javascript"
+			src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+		</script>
+		<script type="text/javascript"
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
+		</script>
+		<script>
+			$(document).ready(function(){
+			  // Add smooth scrolling to all links in navbar + footer link
+			  $(".navbar a, footer a[href='#home']").on('click', function(event) {
+
+			   // Make sure this.hash has a value before overriding default behavior
+			  if (this.hash !== "") {
+
+			    // Prevent default anchor click behavior
+			    event.preventDefault();
+
+			    // Store hash
+			    var hash = this.hash;
+
+			    // Using jQuery's animate() method to add smooth page scroll
+			    // The optional number (900) specifies the number of milliseconds it
+			    // takes to scroll to the specified area
+			    $('html, body').animate({
+			      scrollTop: $(hash).offset().top
+			    }, 900, function(){
+
+			      // Add hash (#) to URL when done scrolling (default click behavior)
+			      window.location.hash = hash;
+			      });
+			    } // End if
+			  });
+			})
+		</script>
+	</head>
+
+	<body id="home" data-spy="scroll" data-target=".navbar" data-offset="60">
+		<nav class="navbar navbar-default navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse"
+						data-target="#myNavbar">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>                        
+					</button>
+					<a class="navbar-brand" href="https://viclai.github.io/"
+						title="Back to Main">
+						<i class="glyphicon glyphicon-chevron-left"></i>
+					</a>
+				</div>
+				<div class="collapse navbar-collapse" id="myNavbar">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#background">BACKGROUND</a></li>
+						<li><a href="#code">CODE</a></li>
+						<li><a href="#report">FINAL REPORT</a></li>
+						<li><a href="#results">RESULTS</a></li>
+						<li><a href="#references">REFERENCES</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<div class="jumbotron text-center">
+			<h1>PREDICTING LESION GROWTH</h1> 
+			<p>
+				<em>using</em> Machine Learning
+			</p>
+			<div>
+				<a class="btn btn-primary btn-lg"
+					href="https://github.com/viclai/Lesion_Growth_Predictor">
+					View on GitHub
+					<i class="fa fa-github"></i>
+				</a>
+			</div>
+		</div>
+
+		<div id="background" class="container-fluid">
+			<h2>Background</h2>
+			<p>
+				The purpose of this project is to evaluate various incremental machine
+				learning algorithms in predicting the growth of ischemic stroke lesion
+				by using pre-processed data extracted from MRI images. In particular,
+				magnetic resonance in conjunction with perfusion imaging is used to
+				extract important features and parameters to classify salvageable brain
+				tissue. Studies and research done in this field are intended to move
+				away from the single-voxel approach and instead, use a correlated,
+				spatial approach in making predictions. By coming up with more refined
+				algorithms that capture more of the complexity but also eliminate the
+				noise of the data set available, more accurate predictions can be made
+				in whether or not a given patient should undergo treatment. Moreover,
+				exploring techniques that are capable of learning one data instance at
+				a time can potentially improve the efficiency of such predictions.
+			</p>
+			<p>
+				Before any analysis can be performed, the data must first be put
+				together from MRI images of patients that are extracted via
+				segmentation and registration. The process involves identifying tissue
+				at risk and infarcted tissue and integrating different types of images
+				like diffusion weighted and perfusion weighted images to be able to
+				study different parameters and features such as cerebral blood volume,
+				time to peak, and mean transit time. Whatever model is developed using
+				the processed data can then be compared with the ground truth of
+				infarcted tissue segmented out of FLAIR images taken days after
+				intervention [3].
+			</p>
+			<p>
+				Although there have been models of tissue fate studied using single,
+				independent voxels, models that consider correlated, surrounding tissue
+				have showed better performance because of their robustness to noise.
+				Supervised regression models, for example, have been proposed that are
+				trained on a set of FLAIR images with known outcomes and making a
+				prediction based on FLAIR intensity. In fact, results from experiments
+				[2] have shown that nonlinear models are more applicable than linear
+				ones for considering regional features of a voxel. A model of deep
+				learning, the Convolutional Neural Network [3] which involves multiple
+				intermediate layers taking in a Tmax map as input, also showed better
+				performance over a linear regression model that was single-voxel based.
+			</p>
+			<p>
+				Research has also been done to explore other factors beyond the voxels
+				of an MRI image that can also determine the fate of brain tissue. The
+				model of forest classifiers, for example, takes into account not only
+				the voxels of an image, but also the level of therapy performed, in
+				predicting tissue growth. Acknowledging that many other studies do not
+				account for this factor of degree of intervention in predicting the
+				fate of tissue, R. McKinley et al. trained two separate models, one
+				making a prediction given a good response to therapy and the other
+				making a prediction based on no intervention. To segment out the
+				penumbra, the tissue at risk, a unique algorithm that involved making
+				a prediction based on a collection of decision trees constructed, was
+				utilized [3].
+			</p>
+			<p>
+				Although not all of the mentioned models [2], [4] use data that is
+				adequate, uniformly distributed, and representative of all stroke
+				patients, it should not be an issue going forward considering that
+				there is an abundance of medical data for researchers to work with.
+				With the availability of data and growing technology of digital and
+				medical imaging, many other learning techniques, like incremental
+				ones, can be explored. Computational power and data storage have both
+				grown in the last twenty years [3] to facilitate deep learning.
+				However, sometimes main memory may be limited, so incremental learning
+				can be efficient and more scalable.
+			</p>
+		</div>
+
+		<div id="code" class="container-fluid bg-grey">
+			<h2>Code</h2>
+			<p>
+				The framework to apply various machine learning techniques on the
+				relevant set of data is maintained on <a 
+					href="https://github.com/viclai/Lesion_Growth_Predictor"
+					target="_blank">GitHub</a>. Please follow the
+				repository to view the progress of this project.
+			</p>
+		</div>
+
+		<div id="report" class="container-fluid">
+			<h2>Final Report</h2>
+
+			<h3>Methods</h3>
+			<p>
+				Although there exists software to compute perfusion values from tissue
+				concentration time curves and AIF, the values generated can often be
+				noisy, so machine learning is believed to have potential in accurately
+				predicting such values. With increasingly more data becoming available,
+				incremental learning can efficiently make predictions and potentially
+				perform as well as batch-based learning. For this study, the predictive
+				models used were those from <a href="http://scikit-learn.org/stable/"
+					target="_blank">scikit-learn</a>, a Python library for machine
+				learning. In particular, the regression-based versions of stochastic
+				gradient descent (SGD) and Passive-Aggressive (PA) were utilized in
+				experiments to evaluate the potential of incremental models in
+				predicting perfusion parameters. Accurate prediction of perfusion
+				values like <em>TMAX</em> and <em>MTT</em> can be helpful indicators of
+				tissue outcome, which would then be critical for clinicians to make
+				decisions regarding patients with acute ischemic stroke. The subset of
+				data that was used to apply incremental machine learning algorithms on
+				was provided by Fabien Scalzo’s research team. Supplementary libraries
+				like <a href="https://matplotlib.org/" target="_blank">matplotlib</a>
+				and <a href="http://pandas.pydata.org/" target="_blank">pandas</a> were
+				included in scripts to help tune hyperparameters, visualize data, and
+				conveniently record results.
+			</p>
+
+			<h3>Evaluation</h3>
+			<p>
+				Experiments were performed as attempts to answer some important
+				questions. Does the performance improve with each batch of data that
+				the model incrementally trains on? Does increasing the patch radius, or
+				window size, actually improve the performance as many studies have
+				found? How do the incremental models perform in comparison to
+				batch-based models? How well do the models predict each perfusion
+				parameter? The resulting numbers from these experiments were compared
+				with the performance numbers of batch-based models including support
+				vector regression and linear regression, all of which were provided by
+				a member of Scalzo’s research team. Root-mean-square error and
+				coefficient of determination (R<sup>2</sup> score) were the performance
+				metrics used to gauge the accuracy of predictions. The overall problem
+				can be regarded as a regression-based task where the output corresponds
+				to a perfusion value.
+			</p>
+			<p>
+				The data instances are pixels from perfusion-weighted images of the
+				brains of anonymous stroke patients admitted to the UCLA Medical
+				Center. The features essentially make up a concatenated concentration
+				time curve (CTC) with the AIF appended. A script was included with the
+				data for convenient extraction of the data given the perfusion
+				parameter to predict and the size of the patch to extract for each
+				pixel. In particular, two data sets were provided for each combination
+				of perfusion parameter and patch radius. The larger set and smaller set
+				were meant to be used to train the model and verify, or test, the
+				model, respectively. The number of examples in each set varied across
+				perfusion parameter, but there were roughly 7000-8000 instances in the
+				larger set and 2000-3000 in the smaller set. The test dataset contained
+				examples of new patients not included in the examples of the training
+				dataset.  
+			</p>
+			<p>
+				By creating and using various visualization tools, we found many
+				noteworthy things regarding the provided data even before conducting
+				the experiments. Although we were told that the distribution of the
+				data was uniform, we found that by generating histograms of the
+				distribution of each dataset, it was only roughly uniform relative to
+				predetermined bin sizes. The distributions are shown in Figures 1-10.
+				Nevertheless, because there was not any sharp skewness observed, the
+				non-uniformity should not have affected too much of our results. We
+				also discovered that each row of the data matrix was sorted by the bins
+				that each value of the ground truth belonged to, which we thought was
+				significant considering that the way in which our incremental models
+				are fed each batch of training data would matter in how well they
+				perform.
+			</p>
+
+			<h3>Results</h3>
+			<p>
+				We observed steady improvements in accuracy with increasingly more
+				batches trained on our incremental models, as shown in Figure 17.
+				The training RMSE of SGD, for example, decreased by 0.00502 ± 0.0057,
+				while the test error decreased by 0.00570 ± 0.0063 for each new batch
+				of size 1 trained on.  
+			</p>
+			<p>
+				Our experiment of varying patch sizes showed slight improvements in
+				accuracy for limited patch radiuses, as depicted in Figure 12. For SGD,
+				an impressive order of magnitude improvement was observed in
+				predicting <em>TMAX</em>. A single-voxel-based approach resulted in a
+				RMSE of 68.1 ± 0.021, which improved to 51.5 ± 0.037 with a slightly
+				larger patch radius of 1. However, increasing the patch radius any
+				further only reduced the accuracies. In contrast to a batch-based model
+				in linear support vector regression, the error consistently decreased
+				from 37.5 to 33.1 as the patch size increased from 1 x 1 to 13 x 13.  
+			</p>
+			<p>
+				The accuracies across incremental and batch-based models are reported
+				in Figures 13-16. Based on running the experiment multiple times with
+				different random seeds, PA remarkably produced an RMSE of 10.7 ± 0.055
+				and 16.8 ± 0.0059 in predicting a patch size of 13 x 13 for
+				<em>RBV</em> and <em>MTT</em>, respectively. In comparison,
+				batch-based models like kernel ridge regression performed with an RMSE
+				of 18.4 and 22.5 for <em>RBV</em> and <em>MTT</em>, respectively, on
+				the given test datasets.
+			</p>
+
+			<h3>Discussion</h3>
+			<p>
+				Our experimental results showed that the performance numbers of SGD
+				were affected when the data was not shuffled before training. With each
+				batch trained on, we observed that the training and test errors
+				continued to decrease for the first several batches but then increased
+				for the last few batches.  On the other hand, with shuffling, the
+				performance continued to improve with increasingly more batches. The
+				problem that we envisioned can be related to a situation in which a
+				classifier trains on data instances that all belong to the same class,
+				but then performs poorly on new examples belonging to a different
+				class. In fact, our models seem to put less weight on examples with
+				different outcomes that come in later batches [1], so randomization
+				becomes important.
+			</p>
+			<p>
+				Even though many studies in the field have shown that the surrounding
+				distribution of a voxel can be predictive of tissue outcome, increasing
+				the size of the patch in our experiments showed only small improvements
+				in accuracy. The maximum number of data examples provided were trained
+				for each patch radius in this experiment. The small disparities in
+				performance can be explained by the fact that there exists a
+				convergence of the optimal patch size, and more training instances may
+				be needed to see a more noticeable improvement. There also may have
+				been some kind of noise involved as the numbers for PA did not show any
+				consistent trends.
+			</p>
+			<p>
+				With reasonable tuning of each model’s respective parameters, the
+				performance numbers of our incremental models showed comparable results
+				to the batch-based ones. For each perfusion parameter and model, cross
+				validation was performed on the training set for tuning, before the
+				full training and test sets were used to train and test the models,
+				respectively. Perhaps with the exception of linear regression, all of
+				the models seemed to show rather similar numbers in RMSE on the test
+				datasets. However, testing on more subsets of patient data will be
+				required in order to verify any significance of performance between
+				models.
+			</p>
+			<p>
+				Although the experiments conducted have answered some questions about
+				the potential of incremental models in predicting perfusion values,
+				more can be done to verify and possibly exploit more of such models. In
+				particular, kernels can be utilized to map the features to another
+				space to exploit a potentially nonlinear relationship in the data.
+				Hopefully by putting more effort into creating another visualization
+				method that can perform dimensionality reduction (e.g. PCA), we can
+				potentially confirm the linearity or non-linearity of the data. We
+				could even oversample or undersample the data ourselves to see if an
+				equal number of perfusion values drastically affects performance. More
+				data, if available, can also be fed into the models, especially to
+				verify if more training instances can lead to improved performance for
+				larger patch sizes [2]. Furthermore, an experiment can also be done to
+				see if removing the features representing the AIF affects the results
+				in any significant way.
+			</p>
+		</div>
+
+		<div id="results" class="container-fluid bg-grey">
+			<h2>Results</h2>
+			<p>
+				Here is an updated list of our major findings.
+			</p>
+			<p>
+				First, we present information regarding the provided data. The
+				distribution of each combination of perfusion parameter and data type
+				(training or test) is presented in Figures 1-10.
+			</p>
+			<br />
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#rbf_train_modal">
+							<img src="https://plot.ly/~viclai/3.png?share_key=9Zxi30Uc5OnyiJVoIAbiA0"
+								alt="rbf_training_distribution"
+								style="max-width: 100%;width: 600px;" width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 1: Distribution of <em>RBF</em> training set.
+					</figcaption>
+				</div>
+				<!-- RBF Training - Modal -->
+				<div id="rbf_train_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/3.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#rbf_test_modal">
+							<img src="https://plot.ly/~viclai/5.png?share_key=jsm8tORFzssUqQBIyKVLGM"
+								alt="rbf_test_distribution"
+								style="max-width: 100%;width: 600px;" 
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 2: Distribution of <em>RBF</em> test set.
+					</figcaption>
+				</div>
+				<!-- RBF Test - Modal -->
+				<div id="rbf_test_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/5.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#tmax_train_modal">
+							<img src="https://plot.ly/~viclai/7.png?share_key=BI8wP4vDy86xfyn7M3NKiq"
+								alt="tmax_train_distribution"
+								style="max-width: 100%;width: 600px;"  width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 3: Distribution of <em>TMAX</em> training set.
+					</figcaption>
+				</div>
+				<!-- TMAX Training - Modal -->
+				<div id="tmax_train_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/7.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#tmax_test_modal">
+							<img src="https://plot.ly/~viclai/9.png?share_key=Knhi9wIRAHsdq5bfAd8oX6"
+								alt="tmax_test_distribution"
+								style="max-width: 100%;width: 600px;" width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 4: Distribution of <em>TMAX</em> test set.
+					</figcaption>
+				</div>
+				<!-- TMAX Test - Modal -->
+				<div id="tmax_test_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/9.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#ttp_train_modal">
+							<img src="https://plot.ly/~viclai/11.png?share_key=sFcjfXgYGJARf7jhg1Tj5S"
+								alt="ttp_train_distribution"
+								style="max-width: 100%;width: 600px;" width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 5: Distribution of <em>TTP</em> training set.
+					</figcaption>
+				</div>
+				<!-- TTP Training - Modal -->
+				<div id="ttp_train_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/11.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#ttp_test_modal">
+							<img src="https://plot.ly/~viclai/13.png?share_key=AeVFSgiV7VfPa3fhRl3YyO"
+								alt="ttp_test_distribution" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 6: Distribution of <em>TTP</em> test set.
+					</figcaption>
+				</div>
+				<!-- TTP Test - Modal -->
+				<div id="ttp_test_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/13.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#mtt_train_modal">
+							<img src="https://plot.ly/~viclai/15.png?share_key=K0EouCyDwpHCDcgM9v3IQS"
+								alt="mtt_train_distribution"
+								style="max-width: 100%;width: 600px;" width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 7: Distribution of <em>MTT</em> training set.
+					</figcaption>
+				</div>
+				<!-- MTT Training - Modal -->
+				<div id="mtt_train_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/15.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#mtt_test_modal">
+							<img src="https://plot.ly/~viclai/17.png?share_key=TVsFQHPYIbmA3oOFmHRRcV"
+								alt="mtt_test_distribution" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 8: Distribution of <em>MTT</em> test set.
+					</figcaption>
+				</div>
+				<!-- MTT Test - Modal -->
+				<div id="mtt_test_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/17.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#rbv_train_modal">
+							<img src="https://plot.ly/~viclai/19.png?share_key=sJibUbasmtgjv9F6EyE4hG"
+								alt="rbv_train_distribution"
+								style="max-width: 100%;width: 600px;" width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 9: Distribution of <em>RBV</em> training set.
+					</figcaption>
+				</div>
+				<!-- RBV Training - Modal -->
+				<div id="rbv_train_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/19.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#rbv_test_modal">
+							<img src="https://plot.ly/~viclai/21.png?share_key=nWKfoCX7b0CoxDbfhK0uod"
+								alt="rbv_test_distribution" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+					</figure>
+					<figcaption class="figure-caption text-center">
+						Figure 10: Distribution of <em>RBV</em> test set.
+					</figcaption>
+				</div>
+				<!-- RBV Test - Modal -->
+				<div id="rbv_test_modal" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/21.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+			<p>
+				Although we were told that each dataset is uniformly distributed, we
+				found that the distributions varied from generating those bar charts.
+				The data for each perfusion parameter was sampled with a bin size of 1,
+				except for RBF, which used a bin size of 2. Some examples were
+				duplicated (oversampled) for the purpose of achieving a more uniform
+				distribution across bins. The number of examples in each dataset is
+				shown in Figure 11 below.
+			</p>
+			<div>
+				<figure class="figure text-center">
+					<button type="button" class="btn btn-info btn-lg" data-toggle="modal"
+						data-target="#datset_sizes">
+						<img src="https://plot.ly/~viclai/23.png?share_key=83AcT0lOeECJwQcP5PxEYJ"
+							alt="perfusion_datasets" style="max-width: 100%;width: 600px;"
+							width="600"
+							onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+					</button>
+					<figcaption class="figure-caption text-center">
+						Figure 11: Size of datasets.
+					</figcaption>
+				</figure>
+			</div>
+			<!-- Table of datset sizes - Modal -->
+			<div id="datset_sizes" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-lg">
+
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">
+								&times;
+							</button>
+						</div>
+						<div class="modal-body">
+							<iframe width="850" height="500" frameborder="0" scrolling="no"
+								src="https://plot.ly/~viclai/23.embed?autosize=True&link=false">
+							</iframe>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<br />
+			<p>
+				The number of features for a given instance is dependent on the patch
+				radius specified. The patch radius refers to regional distribution of a
+				particular voxel. Many studies have found that by taking into
+				consideration the surrounding region of a given voxel, the accuracy of
+				predictions improves. We define this square region as a patch, or
+				window. The window size is the length of this region. The patch radius
+				is the distance from the given voxel to an edge of the region. For
+				example, if the patch radius is 4, then the window size is 9 (or 9 x
+				9). A single-voxel-based approach, which does not use a regional
+				distribution, uses a patch radius of 0 (and window size of 1 x 1).
+				Mathematically, the window size is computed by squaring the value of
+				the patch radius and adding one.
+			</p>
+			<br />
+			<figure class="figure text-center">
+				<img src="https://lh5.googleusercontent.com/tY68cAl4Kl-MKMABPVOdCgAam-X1rw0rGoH3bmv9CPuTtlfKP295A67BGnR2Rnzl4XbaJEQYpekmOgc=w2880-h1404"
+					class="img-thumbnail" width="30%" height="30%" alt="Patch Diagram" />
+			</figure>
+
+			<br />
+			<p>
+				Regardless of the window size, the last 40 columns of each data
+				instance is representative of the AIF. The remaining columns refer to
+				the concentration time curves (CTC) of each voxel in the patch. Each
+				CTC accounts for 40 additional columns. Mathematically, the total
+				number of features can be calculated by multiplying the area of the
+				patch (i.e. the window size squared) by the size of the CTC (which is
+				40) and adding the size of the AIF (which is also 40). For example, if
+				the patch size is 13, then there are 6,800 total features.
+			</p>
+			<p>
+				Another note about the data is that each row of the matrix is sorted
+				by the bins that each value of the ground truth (outcome) belongs to.
+			</p>
+
+			<hr />
+
+			<p>
+				Now we present the actual results!
+			</p>
+			<p>
+				Please note that the error bars (which are very small) generated in the
+				graphs that follow are based on running our experiments multiple times
+				with each trial using a different seed. Because our incremental models
+				are non-deterministic and use a seed for a pseudo random number
+				generator as part of their respective stochastic algorithms, the
+				average and standard deviation are reported after the trials have been
+				run. Normally experiments are run repetitively in a manner where each
+				trial involves a different split of training and test data (via cross
+				validation). Because we were only provided a subset of data and the
+				patients were unable to be distinguished from the voxels of data, we
+				were unable to run standard procedure with different sets of patients
+				for a given perfusion parameter and patch size.
+			</p>
+
+			<br />
+			<p>
+				<strong>Does increasing the patch radius, or window size, actually
+				improve the performance of incremental models?</strong> Figure 12 shows
+				that increasing the region of a voxel slightly decreases the training
+				error of our incremental models.
+			</p>
+
+			<br />
+
+			<div>
+				<figure class="figure text-center">
+					<button type="button" class="btn btn-info btn-lg" data-toggle="modal"
+						data-target="#patch_sizes">
+						<img src="https://plot.ly/~viclai/25.png?share_key=t4GgWMGTqds14YiYvbw8QI"
+							alt="varying_patch_radiuses"
+							style="max-width: 100%;width: 600px;"
+							width="600"
+							onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+					</button>
+					<figcaption class="figure-caption text-center">
+						Figure 12: Performance of models with varying patch size.
+					</figcaption>
+				</figure>
+			</div>
+			<!-- Figure 12 - Modal -->
+			<div id="patch_sizes" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-lg">
+
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">
+								&times;
+							</button>
+						</div>
+						<div class="modal-body">
+							<iframe width="850" height="500" frameborder="0" scrolling="no"
+								src="https://plot.ly/~viclai/25.embed?autosize=True&link=false">
+							</iframe>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<br />
+			<p>
+				The plot specifically depicts results from training PA and SGD with a
+				default batch size of 100 on perfusion parameter <em>TMAX</em>,
+				compared to those for a batch-based algorithm in linear SVR. Very small
+				improvements in accuracy can be seen from increasing the patch size. A
+				closer look at the numbers can be found <a
+					href="https://plot.ly/~viclai/36.embed" target="_blank">here</a>.
+			</p>
+
+			<hr />
+
+			<p>
+				<strong>How do the incremental models perform in comparison to
+				batch-based models? How well do they predict each perfusion parameter?
+				</strong> Figures 13-16 show the training and test performance of our
+				incremental models compared with some batch-based models.
+			</p>
+
+			<br />
+
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#train_rmse">
+							<img src="https://plot.ly/~viclai/29.png?share_key=6GF5AIGZvBKdbAceX6akA4"
+								alt="training_rmse" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+						<figcaption class="figure-caption text-center">
+							Figure 13: Average training root mean squared error across models.
+						</figcaption>
+					</figure>
+				</div>
+				<!-- Figure 13 - Modal -->
+				<div id="train_rmse" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/29.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#train_r2">
+							<img src="https://plot.ly/~viclai/31.png?share_key=7rAtswTTb0BGjjMZthcTve"
+								alt="training_r2" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+						<figcaption class="figure-caption text-center">
+							Figure 14: Average training R<sup>2</sup> score across models.
+						</figcaption>
+					</figure>
+				</div>
+				<!-- Figure 14 - Modal -->
+				<div id="train_r2" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/31.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+
+			<div class="row">
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#test_rmse">
+							<img src="https://plot.ly/~viclai/33.png?share_key=Hf82jYqeCE1994OUuZ3Pqh"
+								alt="test_rmse" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+						<figcaption class="figure-caption text-center">
+							Figure 15: Average test root mean squared error across models.
+						</figcaption>
+					</figure>
+				</div>
+				<!-- Figure 15 - Modal -->
+				<div id="test_rmse" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/33.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-6">
+					<figure class="figure text-center">
+						<button type="button" class="btn btn-info btn-lg"
+							data-toggle="modal" data-target="#test_r2">
+							<img src="https://plot.ly/~viclai/35.png?share_key=TCuEiqGB3pNVVoEAmljIlz"
+								alt="test_r2" style="max-width: 100%;width: 600px;"
+								width="600"
+								onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+						</button>
+						<figcaption class="figure-caption text-center">
+							Figure 16: Average test R<sup>2</sup> score across models.
+						</figcaption>
+					</figure>
+				</div>
+				<!-- Figure 16 - Modal -->
+				<div id="test_r2" class="modal fade" role="dialog">
+					<div class="modal-dialog modal-lg">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									&times;
+								</button>
+							</div>
+							<div class="modal-body">
+								<iframe width="850" height="500" frameborder="0" scrolling="no"
+									src="https://plot.ly/~viclai/35.embed?autosize=True&link=false">
+								</iframe>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">
+									Close
+								</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<br />
+
+			<p>
+				The models were compared across perfusion parameters using a patch
+				radius of 6. The perfusion parameters <em>RBF</em> and <em>RBV</em>
+				are similar to <em>CBF</em> and <em>CBV</em>, respectively.
+			</p>
+			<p>
+				Generally speaking, our incremental models showed from training and
+				test to be comparable in predictive power with the other batch-based
+				models. In fact, they even showed better accuracy for perfusion
+				parameters like <em>MTT</em> and <em>RBV</em>. Since our incremental
+				models did not take advantage of kernels (and do not naturally and
+				internally support them in <a href="http://scikit-learn.org/stable/"
+					target="_blank">scikit-learn</a>), there is some reason to
+				believe that PA and SGD can be improved if the data has a non-linear
+				distribution.  Because the data contains many features, it was
+				difficult to visualize the shape of the data. The distribution will be
+				verified later by performing dimensionality reduction (e.g. PCA),
+				perhaps.
+			</p>
+			<p>
+				The results for the batch-based models were recorded by a member of
+				Fabien Scalzo's research team. A closer look at those numbers can be
+				found <a href="https://plot.ly/~viclai/37.embed" target="_blank">
+					here</a>. The batch-based models that were used were linear
+				regression (linreg), support vector regression with linear kernel
+				(linsvr), support vector regression with RBF kernel (rbfsvr), ridge
+				regression with linear kernel (linkridge), ridge regression with RBF
+				kernel (rbfkridge), and decision tree regressor (tree). Note that no
+				tuning was performed on any of those models (so the the parameters for
+				each model were left at their default values). The relatively poor
+				performance numbers of the linear regression model might be explained
+				by the lack of tuning. However, the model that was used (from <a
+					href="http://scikit-learn.org/stable/" target="_blank">
+					scikit-learn</a>) does not seem to be very flexible in varying
+				parameters as it does not seem to have a regularization parameter, for
+				example, so the model easily overfits.
+			</p>
+			<p>
+				A closer look at the numbers for the incremental models can be found
+				<a href="https://plot.ly/~viclai/38/" target="_blank">here</a>.
+			</p>
+
+			<hr />
+
+			<p>
+				<strong>Does the performance of an incremental model improve with each
+				batch of data that it trains on?</strong> The following scatter plots
+				verifies our finding that the performance of incremental learning on
+				perfusion values improves with increasingly more examples trained on.
+			</p>
+
+			<br />
+
+			<div>
+				<figure class="figure text-center">
+					<button type="button" class="btn btn-info btn-lg" data-toggle="modal"
+						data-target="#inc_perf">
+						<img src="https://plot.ly/~viclai/27.png?share_key=6TNqSWPZCAxmDuWHf50dVP"
+							alt="sgd_incremental" style="max-width: 100%;width: 600px;"
+							width="600"
+							onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
+					</button>
+					<figcaption class="figure-caption text-center">Figure 17.</figcaption>
+				</figure>
+			</div>
+			<!-- Figure 17 - Modal -->
+			<div id="inc_perf" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-lg">
+
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">
+								&times;
+							</button>
+						</div>
+						<div class="modal-body">
+							<iframe width="850" height="500" frameborder="0" scrolling="no"
+								src="https://plot.ly/~viclai/27.embed?autosize=True&link=false">
+							</iframe>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<br />
+
+			<p>
+				The plots specifically shows the results from training stochastic
+				gradient descent with a batch size of 1 on perfusion parameter
+				<em>RBF</em> and patch radius 6. Shuffling of the rows of the data
+				matrix is necessary in order to observe this improvement. A closer look
+				at the numbers can be viewed <a
+					href="https://drive.google.com/file/d/0B3KRJKZtyIdydkxMalJPRkp4b2M/view"
+					target="_blank">here</a>. The incremental performance of PA shows a
+				similar trend with increasingly more batches trained on.
+			</p>
+		</div>
+
+		<div id="references" class="container-fluid">
+			<h2>References</h2>
+			<p>
+				<ol>
+					<li>
+						"6. Strategies to scale computationally: bigger data,"
+						<em>scikit-learn</em>.  [Accessed April 21, 2017].
+					</li>
+					<li>
+						F. Scalzo et al., "Regional Prediction of Tissue Fate in Acute
+						Ischemic Stroke," <em>Annals of Biomedical Engineering</em>, vol.
+						40. doi:10.1007/s10439-012-0591-7. [Accessed: April 11, 2017].
+					</li>
+					<li>
+						N. Stier et al., "Deep Learning of Tissue Fate Features in Acute
+						Ischemic Stroke," <em>IEEE BIBM</em>.
+						doi:10.1109/BIBM.2015.7359869. [Accessed: April 11, 2017].
+					</li>
+					<li>
+						R. McKinley et al., "Fully automated stroke tissue estimation using
+						random forest classifiers (FASTER)," <em>JCBFM</em>.
+						doi: 10.1177/0271678X16674221. [Accessed: April 11, 2017].
+					</li>
+				</ol>
+			</p>
+		</div>
+
+		<footer class="container-fluid text-center bg-grey">
+			<a href="#home" title="To Top">
+				<span class="glyphicon glyphicon-chevron-up"></span>
+			</a>
+			<p>Back to Top</p>
+		</footer>
+	</body>
+</html>

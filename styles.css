@@ -1,0 +1,54 @@
+hr {
+	border-color: black;
+	background-color: black;
+	color: black;
+}
+
+.jumbotron { 
+	background-color: #00b8e6;
+	color: #ffffff;
+	padding: 100px 25px;
+}
+
+.bg-grey {
+	background-color: #f6f6f6;
+}
+
+.container-fluid {
+	padding: 60px 50px;
+}
+
+.navbar {
+	margin-bottom: 0;
+	background-color: #00b8e6;
+	z-index: 9999;
+	border: 0;
+	font-size: 12px !important;
+	line-height: 1.42857143 !important;
+	letter-spacing: 4px;
+	border-radius: 0;
+}
+
+.navbar li a, .navbar .navbar-brand {
+	color: #fff !important;
+}
+
+.navbar-nav li a:hover, .navbar-nav li.active a {
+	color: #00b8e6 !important;
+	background-color: #fff !important;
+}
+
+.navbar-default .navbar-toggle {
+	border-color: transparent;
+	color: #fff !important;
+}
+
+footer .glyphicon {
+	font-size: 20px;
+	margin-bottom: 20px;
+	color: #00b8e6;
+}
+
+.modal {
+	z-index: 99999;
+}
