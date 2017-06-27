@@ -12,9 +12,9 @@ used for this project. Specifically ask for the matrices.
 
 The dataset used in this project (not included in this repository) contains 
 data associated with perfusion imaging of the brains of anonymous stroke 
-patients admitted to the University of California, Los Angeles medical center.
-The data was pre-processed (via image segmentation, registration, etc.) by 
-Scalzo's lab team.
+patients admitted to the University of California, Los Angeles Medical Center
+:hospital:. The data was pre-processed (via image segmentation, registration,
+etc.) by Scalzo's lab team.
 
 # Development
 Functionality has been implemented to load the data from the dataset (not
@@ -31,15 +31,15 @@ evaluated.
 # Installation
 Download or clone this repository. 
 
-Make sure Python **2.x** is installed on your machine. The following 
-packages are used in the scripts.
+Make sure Python **2.x** is installed on your machine. The program currently
+does not support Python 3. The following packages are used in the scripts.
 
 * [numpy](http://www.numpy.org/)
 * [matplotlib](https://matplotlib.org/)
 * [scipy](https://www.scipy.org/)
 * [scikit-learn](http://scikit-learn.org/stable/)
 * [pandas](http://pandas.pydata.org/)
-# [plotly](https://plot.ly/)
+* [plotly](https://plot.ly/)
 
 # Usage
 Note that there is no dataset published to this repository, so make sure a 
