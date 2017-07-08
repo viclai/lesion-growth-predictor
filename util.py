@@ -157,6 +157,7 @@ def label_distribution(y, binsize=1, dir='plots', **kwargs):
     else:
         fontsize = kwargs.pop('fontsize')
 
+    # Upper bound inclusive
     slots = [((slot / binsize) * binsize) + binsize if slot % binsize != 0
         else slot for slot in np.ceil(y).A1.astype(int)
         ]
@@ -215,7 +216,7 @@ def label_distribution(y, binsize=1, dir='plots', **kwargs):
         plt.draw()
         plt.pause(0.001)
 
-def statistics(X, y, filename='stats.csv', **kwargs):
+def statistics(X, y, filename='stats.csv', dir='stats', **kwargs):
     """
     Displays statistics relating to the data.
 
@@ -242,7 +243,6 @@ def statistics(X, y, filename='stats.csv', **kwargs):
         d[features[i]] = feat
     df = pd.DataFrame(d)
 
-    dir = 'stats'
     if not os.path.exists(dir):
         os.makedirs(dir)
     file_path = os.path.join(dir, filename)
@@ -254,6 +254,7 @@ def statistics(X, y, filename='stats.csv', **kwargs):
 
     print ('Writing mean and standard deviation of each feature to ' +
            file_path + '...'),
+    sys.stdout.flush()
     df.to_csv(file_path, mode='w+')
     print 'Done.'
 

@@ -2,7 +2,8 @@
 
 *Lesion Growth Predictor* is a [course](https://sa.ucla.edu/ro/Public/SOC/Results/ClassDetail?term_cd=17S&subj_area_cd=COM%20SCI&crs_catlg_no=0188%20%20%20%20&class_id=187827210&class_no=%20002%20%20)
 project in development which predicts lesion growth for patients with stroke.
-Read about our findings [here](https://sites.google.com/g.ucla.edu/predicting-lesion-growth).
+Read about our findings
+[here](https://viclai.github.io/Lesion_Growth_Predictor/).
 
 ![Demo](hub/demo.gif "Program demo")
 
