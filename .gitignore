@@ -3,3 +3,4 @@ extracted_data/*
 stats/*
 csv/*
 plots/*
+amazon_ml/*

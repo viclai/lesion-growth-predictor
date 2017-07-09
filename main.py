@@ -62,7 +62,7 @@ def evaluate_param():
 
         ### Enter patch radius ###
         patch_rad = None
-        patch_rad_range = [i for i in xrange(7)]
+        patch_rad_range = p_data.patch_radiuses
         while True:
             patch_rad = raw_input('Enter patch radius (0-6): ')
             if patch_rad == controls['Skip']:

@@ -1,10 +1,15 @@
 from enum import Enum
+from collections import OrderedDict
 from extracted_data.uniform_sampled.ten_k_subset \
     import matrix_loader as ml
 from util import two_dimensional_slices, label_distribution, \
                  scatter_matrix, statistics
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import json
+import sys
+import os
 
 class NoDataError(Exception):
     def __init__(self, msg='No data loaded'):
@@ -38,10 +43,10 @@ class DataSet(object):
         self.y = y
 
     def load(self):
-        pass
+        raise NotImplementedError()
 
     def plot(self):
-        pass
+        raise NotImplementedError()
 
 
 class PerfusionDataSet(DataSet):
@@ -49,14 +54,16 @@ class PerfusionDataSet(DataSet):
     patch_radiuses = [int(r[0]) for r in ml.Matrix_loader().halfwindowsizes]
     path_to_dataset = 'extracted_data/uniform_sampled/ten_k_subset'
     uniform_bins = {
-        'rbf' : 2,
-        'rbv' : 1,
-        'mtt' : 1,
-        'ttp' : 1,
+        'rbf'  : 2,
+        'rbv'  : 1,
+        'mtt'  : 1,
+        'ttp'  : 1,
         'tmax' : 1
     }
+    # Number of seconds that separates each concentration level
+    time_interval = 2
 
-    def __init__(self, perfusion_param=None, patch_radius=None):
+    def __init__(self, perfusion_param=None, patch_radius=None, dt=None):
         """
         PerfusionData class.
 
@@ -64,22 +71,26 @@ class PerfusionDataSet(DataSet):
         --------------------
             perfusion_param -- string, perfusion parameter
             patch_radius    -- integer, patch radius
+            dt              -- DataType, type of dataset to load data
+                               to
         """
 
         DataSet.__init__(self)
         self.perfusion_param = perfusion_param
         self.patch_radius = patch_radius
+        self.type = dt
 
     def load(self, perfusion_param, patch_radius, dt):
         """
-        Load memory-mapped files into X array of features and y array of
-        labels.
+        Load memory-mapped files into X array of features and y array
+        of labels.
 
         Parameters
         --------------------
             perfusion_param -- string, perfusion parameter
             patch_radius    -- integer, radius of patch size
-            dt              -- DataType, type of dataset to load data to
+            dt              -- DataType, type of dataset to load data
+                               to
         """
 
         m = ml.Matrix_loader(self.path_to_dataset)
@@ -109,6 +120,7 @@ class PerfusionDataSet(DataSet):
 
         self.perfusion_param = perfusion_param
         self.patch_radius = patch_radius
+        self.type = dt
 
     def concentration_time_curve(self, X, **kwargs):
         """
@@ -124,9 +136,7 @@ class PerfusionDataSet(DataSet):
 
         curves = X.shape[0]
         points = X.shape[1]
-        time_interval = 2 # Number of seconds that separates each concentration
-                          # level
-        time = np.arange(0, points * time_interval, time_interval)
+        time = np.arange(0, points * self.time_interval, self.time_interval)
         plt.ion()
         for i in xrange(curves):
             plt.scatter(time, X[i].A1, **kwargs)
@@ -175,8 +185,9 @@ class PerfusionDataSet(DataSet):
         Parameters
         --------------------
             type     -- string, type of graph/histogram to plot
-                        options: 'ctc', 'tissue-curve', 'aif', '2d-slices',
-                        'label_distribution', 'scatter_matrix', 'stats'
+                        options: 'ctc', 'tissue-curve', 'aif', 
+                        '2d-slices', 'label_distribution',
+                        'scatter_matrix', 'stats'
             dt       -- DataType, type of dataset to plot
         """
 
@@ -210,20 +221,93 @@ class PerfusionDataSet(DataSet):
             label_distribution(y, self.uniform_bins[self.perfusion_param],
                 **kwargs)
         elif type == 'scatter_matrix':
-            time_interval = 2
             kwargs['features'] = ['Time ' + str(i) for i in 
-                xrange(0, time_interval * X.shape[1], time_interval)
+                xrange(0, self.time_interval * X.shape[1], self.time_interval)
                 ]
             scatter_matrix(X, **kwargs)
         elif type == 'stats':
-            time_interval = 2
-            digits = str(len(str(time_interval * X.shape[1])))
+            digits = str(len(str(self.time_interval * X.shape[1])))
             zeros_format = '0' + digits + 'd'
             kwargs['features'] = ['Time ' + format(i, zeros_format) for i in
-                xrange(0, time_interval * X.shape[1], time_interval)
+                xrange(0, self.time_interval * X.shape[1], self.time_interval)
             ]
             filename = ('stats-' + self.perfusion_param + '_' + 
                         str(self.patch_radius) + '_' + type_str + '.csv')
             statistics(X, y, filename=filename, **kwargs)
         else:
             print 'No such plot exists\n'
+
+    def write_amazon_ml_schema(self, dir='amazon_ml'):
+        """
+        Generates a data schema for Amazon ML.
+
+        Parameters
+        --------------------
+            dir -- string, the directory to save the schema to
+        """
+
+        if self.perfusion_param is None:
+            raise TypeError('Perfusion parameter not specified')
+        if self.patch_radius is None:
+            raise TypeError('Patch radius not specified')
+
+        schema = OrderedDict()
+        schema['version'] = '1.0'
+        schema['rowId'] = 'brainPixelId'
+        schema['targetAttributeName'] = self.perfusion_param
+        schema['dataFormat'] = 'CSV'
+        schema['dataFileContainsHeader'] = False
+
+        schema['attributes'] = []
+        schema['attributes'].append(
+            dict(attributeName='brainPixelId', attributeType='CATEGORICAL')
+            )
+        for i in range((1 + (self.patch_radius * 2)) ** 2):
+            for j in range(40):
+                attr = {}
+                attr['attributeName'] = ('CTC ' + str(i + 1) + ' - Time ' +
+                    str(j * self.time_interval))
+                attr['attributeType'] = 'NUMERIC'
+                schema['attributes'].append(attr)
+
+        for i in range(40):
+            attr = {}
+            attr['attributeName'] = ('AIF - Time ' +
+                str(i * self.time_interval))
+            attr['attributeType'] = 'NUMERIC'
+            schema['attributes'].append(attr)
+        schema['attributes'].append(
+            dict(attributeName=self.perfusion_param, attributeType='NUMERIC')
+            )
+
+        filename = (self.perfusion_param + '_' + str(self.patch_radius) +
+            '_data.csv.schema')
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        file_path = os.path.join(dir, filename)
+        with open(file_path, 'w') as outfile:
+            json.dump(schema, outfile, indent=4, separators=(',', ':'))
+
+    def write_to_csv(self, dir='csv'):
+        """
+        Saves the data in a CSV file.
+        This can be used as an Amazon ML datasource, which can hold
+        rows of observations each limited to size of 100 KB.
+
+        Parameters
+        --------------------
+            dir -- string, the directory to save the CSV file to
+        """
+
+        df = pd.DataFrame(self.X[self.type.value])
+        df['y'] = self.y[self.type.value]
+
+        filename = (self.perfusion_param + '_' + str(self.patch_radius) +
+            '_data.csv')
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        file_path = os.path.join(dir, filename)
+        print 'Writing data to ' + file_path + '...',
+        sys.stdout.flush()
+        df.to_csv(file_path, header=False)
+        print 'Done.'
