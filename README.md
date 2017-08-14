@@ -1,13 +1,16 @@
-# Synopsis
+# Lesion Growth Predictor
 
-*Lesion Growth Predictor* is a [course](https://sa.ucla.edu/ro/Public/SOC/Results/ClassDetail?term_cd=17S&subj_area_cd=COM%20SCI&crs_catlg_no=0188%20%20%20%20&class_id=187827210&class_no=%20002%20%20)
-project in development which predicts lesion growth for patients with stroke.
-Read about our findings
+## Synopsis
+
+*Lesion Growth Predictor* is a <a href="https://goo.gl/YwEzqe"
+  title="COM SCI 188">course</a> project in development which predicts lesion
+growth for patients with stroke. Read about our findings
 [here](https://viclai.github.io/Lesion_Growth_Predictor/).
 
 ![Demo](hub/demo.gif "Program demo")
 
-# Data
+## Data
+
 Please contact [Fabien Scalzo](http://web.cs.ucla.edu/~fab/) to access the data
 used for this project. Specifically ask for the matrices.
 
@@ -17,7 +20,8 @@ patients admitted to the University of California, Los Angeles Medical Center
 :hospital:. The data was pre-processed (via image segmentation, registration,
 etc.) by Scalzo's lab team.
 
-# Development
+## Development
+
 Functionality has been implemented to load the data from the dataset (not
 included). Tools to visualize the data have also been created to look for any
 funny values or outliers, examine a range of values more closely, and figure
@@ -29,7 +33,8 @@ well it performs in predicting perfusion parameters of interest. In particular,
 stochastic gradient descent and the Passive-Aggressive algorithms will be 
 evaluated.
 
-# Installation
+## Installation
+
 Download or clone this repository. 
 
 Make sure Python **2.x** is installed on your machine. The program currently
@@ -42,7 +47,8 @@ does not support Python 3. The following packages are used in the scripts.
 * [pandas](http://pandas.pydata.org/)
 * [plotly](https://plot.ly/)
 
-# Usage
+## Usage
+
 Note that there is no dataset published to this repository, so make sure a 
 data set is included as a subdirectory in this repository before running this 
 project. The base class *DataSet* can also be implemented in **_data.py_** to 
